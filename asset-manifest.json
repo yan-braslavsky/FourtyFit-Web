@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/fourtyfit-web/static/css/main.e6c13ad2.css",
-    "main.js": "/fourtyfit-web/static/js/main.b313eea1.js",
-    "static/js/453.64663f9d.chunk.js": "/fourtyfit-web/static/js/453.64663f9d.chunk.js",
-    "index.html": "/fourtyfit-web/index.html",
-    "main.e6c13ad2.css.map": "/fourtyfit-web/static/css/main.e6c13ad2.css.map",
-    "main.b313eea1.js.map": "/fourtyfit-web/static/js/main.b313eea1.js.map",
-    "453.64663f9d.chunk.js.map": "/fourtyfit-web/static/js/453.64663f9d.chunk.js.map"
+    "main.css": "/FourtyFit-Web/static/css/main.e6c13ad2.css",
+    "main.js": "/FourtyFit-Web/static/js/main.815d48c7.js",
+    "static/js/453.64663f9d.chunk.js": "/FourtyFit-Web/static/js/453.64663f9d.chunk.js",
+    "index.html": "/FourtyFit-Web/index.html",
+    "main.e6c13ad2.css.map": "/FourtyFit-Web/static/css/main.e6c13ad2.css.map",
+    "main.815d48c7.js.map": "/FourtyFit-Web/static/js/main.815d48c7.js.map",
+    "453.64663f9d.chunk.js.map": "/FourtyFit-Web/static/js/453.64663f9d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.b313eea1.js"
+    "static/js/main.815d48c7.js"
   ]
 }
