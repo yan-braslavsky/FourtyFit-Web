@@ -3,88 +3,186 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getWorkout, saveWorkout, Workout } from '../services/workoutService';
+import { getExercises, Exercise } from '../services/exerciseService';
 
 const FormContainer = styled.form`
   background-color: ${props => props.theme.colors.background};
-  padding: 1rem;
+  padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 2rem auto;
 `;
 
 const Input = styled.input`
-  margin-bottom: 1rem;
-  padding: 0.5rem;
   width: 100%;
-  border: 1px solid ${props => props.theme.colors.primary};
-  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
 `;
 
 const Button = styled.button`
   background-color: ${props => props.theme.colors.primary};
-  border: none;
   color: ${props => props.theme.colors.text};
-  cursor: pointer;
+  border: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: ${props => props.theme.colors.secondary};
-  }
+  cursor: pointer;
+  margin-right: 0.5rem;
 `;
 
-const ErrorMessage = styled.div`
-  color: red;
+const ExerciseGroup = styled.div`
+  border: 1px solid ${props => props.theme.colors.primary};
+  padding: 1rem;
   margin-bottom: 1rem;
 `;
+
+interface WorkoutExercise {
+  exerciseId: string;
+  sets: number;
+  reps: number;
+  weight: number;
+}
+
+interface ExerciseGroupType {
+  exercises: WorkoutExercise[];
+  sets: number;
+}
 
 const WorkoutForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const [workout, setWorkout] = useState<Workout>({ name: '', exercises: [] });
-  const [error, setError] = useState<string | null>(null);
+  const [workout, setWorkout] = useState<Workout>({ name: '', exerciseGroups: [] });
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [currentGroup, setCurrentGroup] = useState<ExerciseGroupType>({ exercises: [], sets: 1 });
 
   useEffect(() => {
-    if (id) {
-      const fetchWorkout = async () => {
-        try {
-          const fetchedWorkout = await getWorkout(id);
-          setWorkout(fetchedWorkout);
-        } catch (err) {
-          console.error("Error fetching workout:", err);
-          setError("Failed to load workout. Please try again.");
-        }
-      };
-      fetchWorkout();
-    }
+    const fetchData = async () => {
+      const fetchedExercises = await getExercises();
+      setExercises(fetchedExercises);
+
+      if (id) {
+        const fetchedWorkout = await getWorkout(id);
+        setWorkout(fetchedWorkout);
+      }
+    };
+    fetchData();
   }, [id]);
+
+  const handleAddExercise = () => {
+    setCurrentGroup(prevGroup => ({
+      ...prevGroup,
+      exercises: [
+        ...prevGroup.exercises,
+        { exerciseId: '', sets: 1, reps: 0, weight: 0 }
+      ]
+    }));
+  };
+
+  const handleExerciseChange = (index: number, field: keyof WorkoutExercise, value: string | number) => {
+    setCurrentGroup(prevGroup => ({
+      ...prevGroup,
+      exercises: prevGroup.exercises.map((exercise, i) =>
+        i === index ? { ...exercise, [field]: value } : exercise
+      )
+    }));
+  };
+
+  const handleAddGroup = () => {
+    setWorkout(prevWorkout => ({
+      ...prevWorkout,
+      exerciseGroups: [...prevWorkout.exerciseGroups, currentGroup]
+    }));
+    setCurrentGroup({ exercises: [], sets: 1 });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     try {
       await saveWorkout(workout);
-      console.log("Workout saved successfully");
-      navigate('/'); // Redirect to workout list after successful save
-    } catch (err) {
-      console.error("Error saving workout:", err);
-      setError("Failed to save workout. Please try again.");
+      alert('Workout saved successfully');
+      navigate('/');
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      alert('Failed to save workout');
     }
   };
 
   return (
     <FormContainer onSubmit={handleSubmit}>
       <h2>{id ? 'Edit Workout' : 'Create Workout'}</h2>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
       <Input
         type="text"
+        placeholder="Workout Name"
         value={workout.name}
         onChange={e => setWorkout({ ...workout, name: e.target.value })}
-        placeholder="Workout Name"
         required
       />
-      {/* Add exercise form components here */}
+
+      <h3>Current Exercise Group</h3>
+      <Input
+        type="number"
+        placeholder="Number of Sets"
+        value={currentGroup.sets}
+        onChange={e => setCurrentGroup({ ...currentGroup, sets: parseInt(e.target.value) })}
+        min="1"
+      />
+      {currentGroup.exercises.map((exercise, index) => (
+        <ExerciseGroup key={index}>
+          <Select
+            value={exercise.exerciseId}
+            onChange={e => handleExerciseChange(index, 'exerciseId', e.target.value)}
+            required
+          >
+            <option value="">Select an exercise</option>
+            {exercises.map(ex => (
+              <option key={ex.id} value={ex.id}>
+                {ex.name}
+              </option>
+            ))}
+          </Select>
+          <Input
+            type="number"
+            placeholder="Reps"
+            value={exercise.reps}
+            onChange={e => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
+            min="0"
+          />
+          <Input
+            type="number"
+            placeholder="Weight (kg)"
+            value={exercise.weight}
+            onChange={e => handleExerciseChange(index, 'weight', parseFloat(e.target.value))}
+            min="0"
+            step="0.1"
+          />
+        </ExerciseGroup>
+      ))}
+      <Button type="button" onClick={handleAddExercise}>
+        Add Exercise to Group
+      </Button>
+      <Button type="button" onClick={handleAddGroup}>
+        Add Group to Workout
+      </Button>
+
+      <h3>Workout Exercise Groups</h3>
+      {workout.exerciseGroups.map((group, groupIndex) => (
+        <ExerciseGroup key={groupIndex}>
+          <h4>Group {groupIndex + 1} - {group.sets} sets</h4>
+          {group.exercises.map((exercise, exerciseIndex) => {
+            const selectedExercise = exercises.find(ex => ex.id === exercise.exerciseId);
+            return (
+              <div key={exerciseIndex}>
+                <p>{selectedExercise?.name}: {exercise.reps} reps, {exercise.weight} kg</p>
+              </div>
+            );
+          })}
+        </ExerciseGroup>
+      ))}
+
       <Button type="submit">Save Workout</Button>
     </FormContainer>
   );

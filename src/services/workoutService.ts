@@ -5,19 +5,18 @@ import { db } from '../firebase/config';
 export interface Workout {
   id?: string;
   name: string;
-  exercises: Exercise[];
+  exerciseGroups: ExerciseGroup[];
 }
 
-export interface Exercise {
-  id: string;
-  name: string;
-  sets: Set[];
-  equipment?: string;
-  weight?: number;
+export interface ExerciseGroup {
+  exercises: WorkoutExercise[];
+  sets: number;
 }
 
-export interface Set {
-  repetitions: number;
+export interface WorkoutExercise {
+  exerciseId: string;
+  reps: number;
+  weight: number;
 }
 
 export const getWorkouts = async (): Promise<Workout[]> => {
