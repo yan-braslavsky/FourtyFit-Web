@@ -1,6 +1,7 @@
 // src/services/equipmentService.ts
 import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { where, query, limit } from 'firebase/firestore';
 
 export interface Equipment {
   id?: string;
@@ -18,4 +19,11 @@ export const getEquipment = async (): Promise<Equipment[]> => {
 export const saveEquipment = async (equipment: Equipment): Promise<void> => {
   const newEquipmentRef = doc(collection(db, 'equipment'));
   await setDoc(newEquipmentRef, equipment);
+};
+
+export const checkEquipmentExists = async (name: string): Promise<boolean> => {
+  const equipmentCol = collection(db, 'equipment');
+  const q = query(equipmentCol, where('name', '==', name), limit(1));
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
 };

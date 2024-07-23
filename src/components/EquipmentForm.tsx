@@ -1,12 +1,14 @@
 // src/components/EquipmentForm.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
-import { saveEquipment } from '../services/equipmentService';
+import { saveEquipment, checkEquipmentExists } from '../services/equipmentService';
 import { uploadImage } from '../services/storageService';
-import ImageCropper from './ImageCropper';
+import ImageCropper, { ImageCropperRef } from './ImageCropper';
+import LoadingOverlay from './LoadingOverlay';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const FormContainer = styled.form`
-  background-color: ${props => props.theme.colors.card};
+  background-color: ${props => props.theme.colors.background};
   padding: 2rem;
   border-radius: 8px;
   max-width: 500px;
@@ -27,16 +29,31 @@ const TextArea = styled.textarea`
 
 const Button = styled.button`
   background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.textLight};
+  color: ${props => props.theme.colors.text};
   border: none;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  margin-right: 0.5rem;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 1rem;
+`;
+
+const NameInputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const ValidationIcon = styled.span`
+  position: absolute;
+  right: 5px;
+  top: 38%;
+  transform: translateY(-50%);
 `;
 
 interface Equipment {
@@ -46,25 +63,47 @@ interface Equipment {
 }
 
 const EquipmentForm: React.FC = () => {
-  const [equipment, setEquipment] = useState<Equipment>({
-    name: '',
-    description: '',
-    imageUrl: '',
-  });
+  const [equipment, setEquipment] = useState<Equipment>({ name: '', description: '', imageUrl: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isNameValid, setIsNameValid] = useState<boolean | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropperRef = useRef<ImageCropperRef>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEquipment({ ...equipment, [name]: value });
     setErrors({ ...errors, [name]: '' });
+
+    if (name === 'name') {
+      setIsNameValid(null);
+    }
   };
+
+  const validateName = useCallback(async (name: string) => {
+    if (name.trim() === '') {
+      setIsNameValid(null);
+      return;
+    }
+
+    const exists = await checkEquipmentExists(name);
+    setIsNameValid(!exists);
+  }, []);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      validateName(equipment.name);
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [equipment.name, validateName]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
+      setCroppedImage(null);
     }
   };
 
@@ -77,32 +116,38 @@ const EquipmentForm: React.FC = () => {
     const newErrors: { [key: string]: string } = {};
     if (!equipment.name.trim()) newErrors.name = 'Name is required';
     if (!equipment.description.trim()) newErrors.description = 'Description is required';
-    if (!croppedImage) newErrors.image = 'Image is required';
+    if (!imageFile) newErrors.image = 'Image is required';
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0 && isNameValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
+      setIsLoading(true);
       try {
+        let croppedImageBlob: Blob | null = null;
+        if (cropperRef.current) {
+          croppedImageBlob = await cropperRef.current.cropImage();
+          setCroppedImage(croppedImageBlob);
+        }
+        
         let imageUrl = '';
-        if (croppedImage) {
-          imageUrl = await uploadImage(croppedImage, `equipment/${Date.now()}.png`);
+        if (croppedImageBlob) {
+          imageUrl = await uploadImage(croppedImageBlob, `equipment/${Date.now()}.png`);
         }
         await saveEquipment({ ...equipment, imageUrl });
         alert('Equipment saved successfully');
         setEquipment({ name: '', description: '', imageUrl: '' });
         setCroppedImage(null);
         setImageFile(null);
+        setIsNameValid(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
       } catch (error) {
         console.error('Error saving equipment:', error);
-        if (error instanceof Error) {
-          alert(`Failed to save equipment: ${error.message}`);
-        } else {
-          alert('Failed to save equipment: Unknown error');
-        }
+        alert(`Failed to save equipment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -110,14 +155,20 @@ const EquipmentForm: React.FC = () => {
   return (
     <FormContainer onSubmit={handleSubmit}>
       <h2>Add New Equipment</h2>
-      <Input
-        type="text"
-        name="name"
-        placeholder="Equipment Name"
-        value={equipment.name}
-        onChange={handleInputChange}
-        required
-      />
+      <NameInputWrapper>
+        <Input
+          type="text"
+          name="name"
+          placeholder="Equipment Name"
+          value={equipment.name}
+          onChange={handleInputChange}
+          required
+        />
+        <ValidationIcon>
+          {isNameValid === true && <FaCheck color="green" />}
+          {isNameValid === false && <FaTimes color="red" />}
+        </ValidationIcon>
+      </NameInputWrapper>
       {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
       <TextArea
         name="description"
@@ -132,15 +183,18 @@ const EquipmentForm: React.FC = () => {
         accept="image/*"
         onChange={handleImageUpload}
         ref={fileInputRef}
+        required
       />
       {errors.image && <ErrorMessage>{errors.image}</ErrorMessage>}
       {imageFile && (
         <ImageCropper
           imageFile={imageFile}
           onCrop={handleCrop}
+          ref={cropperRef}
         />
       )}
-      <Button type="submit">Save Equipment</Button>
+      <Button type="submit" disabled={isLoading || isNameValid === false}>Save Equipment</Button>
+      {isLoading && <LoadingOverlay />}
     </FormContainer>
   );
 };
