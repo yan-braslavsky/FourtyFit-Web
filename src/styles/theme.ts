@@ -1,8 +1,15 @@
-import Colors from './Colors';
-
+// src/styles/theme.ts
 export const theme = {
-  colors: Colors.light, // Use light theme by default
-  // You can add more theme properties here, such as typography, spacing, etc.
+  colors: {
+    primary: '#D4A373', // Sandy brown
+    secondary: '#A97A50', // Copper
+    background: '#F5F0E1', // Very light grayish beige
+    text: '#3E3E3E', // Dark gray
+    textLight: '#FFFFFF', // White for text on dark backgrounds
+    card: '#FFF9F3', // Off-white
+    accent: '#E6CBA8', // Light beige
+  },
 };
 
 export type Theme = typeof theme;
+
