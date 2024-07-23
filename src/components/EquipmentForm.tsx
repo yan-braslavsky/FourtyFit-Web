@@ -45,15 +45,20 @@ const ErrorMessage = styled.div`
 `;
 
 const NameInputWrapper = styled.div`
-  position: relative;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const NameInput = styled(Input)`
+  margin-bottom: 0;
+  flex-grow: 1;
 `;
 
 const ValidationIcon = styled.span`
-  position: absolute;
-  right: 5px;
-  top: 38%;
-  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
 `;
 
 interface Equipment {
@@ -151,7 +156,7 @@ const EquipmentForm: React.FC = () => {
     <FormContainer onSubmit={handleSubmit}>
       <h2>Add New Equipment</h2>
       <NameInputWrapper>
-        <Input
+        <NameInput
           type="text"
           name="name"
           placeholder="Equipment Name"
@@ -160,8 +165,8 @@ const EquipmentForm: React.FC = () => {
           required
         />
         <ValidationIcon>
-          {isNameValid === true && <FaCheck color="green" />}
-          {isNameValid === false && <FaTimes color="red" />}
+          {isNameValid === true && <FaCheck color="green" size={20} />}
+          {isNameValid === false && <FaTimes color="red" size={20} />}
         </ValidationIcon>
       </NameInputWrapper>
       {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
