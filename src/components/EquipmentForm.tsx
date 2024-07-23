@@ -1,11 +1,11 @@
 // src/components/EquipmentForm.tsx
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
-import { saveEquipment, checkEquipmentExists } from '../services/equipmentService';
+import { saveEquipment, checkEquipmentExists, getEquipment, deleteEquipment, Equipment } from '../services/equipmentService';
 import { uploadImage } from '../services/storageService';
 import ImageCropper, { ImageCropperRef } from './ImageCropper';
 import LoadingOverlay from './LoadingOverlay';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaTrash } from 'react-icons/fa';
 
 const FormContainer = styled.form`
   background-color: ${props => props.theme.colors.background};
@@ -61,11 +61,40 @@ const ValidationIcon = styled.span`
   margin-left: 0.5rem;
 `;
 
-interface Equipment {
-  name: string;
-  description: string;
-  imageUrl: string;
-}
+const EquipmentList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+  margin-top: 2rem;
+`;
+
+const EquipmentItem = styled.li`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: ${props => props.theme.colors.card};
+  border-radius: 4px;
+`;
+
+const EquipmentImage = styled.img`
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 1rem;
+`;
+
+const EquipmentName = styled.span`
+  flex-grow: 1;
+`;
+
+const DeleteButton = styled.button`
+  background-color: ${props => props.theme.colors.danger || 'red'};
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+`;
 
 const EquipmentForm: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment>({ name: '', description: '', imageUrl: '' });
@@ -73,8 +102,22 @@ const EquipmentForm: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isNameValid, setIsNameValid] = useState<boolean | null>(null);
+  const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<ImageCropperRef>(null);
+
+  useEffect(() => {
+    fetchEquipment();
+  }, []);
+
+  const fetchEquipment = async () => {
+    try {
+      const fetchedEquipment = await getEquipment();
+      setEquipmentList(fetchedEquipment);
+    } catch (error) {
+      console.error('Error fetching equipment:', error);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -139,13 +182,38 @@ const EquipmentForm: React.FC = () => {
         }
         await saveEquipment({ ...equipment, imageUrl });
         alert('Equipment saved successfully');
-        setEquipment({ name: '', description: '', imageUrl: '' });
-        setImageFile(null);
-        setIsNameValid(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
+        resetForm();
+        fetchEquipment(); // Refresh the list
       } catch (error) {
         console.error('Error saving equipment:', error);
         alert(`Failed to save equipment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setEquipment({ name: '', description: '', imageUrl: '' });
+    setImageFile(null);
+    setIsNameValid(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this equipment?')) {
+      try {
+        setIsLoading(true);
+        await deleteEquipment(id);
+        console.log(`Equipment with id ${id} deleted successfully`);
+        fetchEquipment(); // Refresh the list
+      } catch (error) {
+        console.error('Error deleting equipment:', error);
+        if (error instanceof Error) {
+          alert(`Failed to delete equipment: ${error.message}`);
+        } else {
+          alert('Failed to delete equipment: Unknown error');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -193,8 +261,21 @@ const EquipmentForm: React.FC = () => {
           ref={cropperRef}
         />
       )}
-      <Button type="submit" disabled={isLoading || isNameValid === false}>Save Equipment</Button>
+     <Button type="submit" disabled={isLoading || isNameValid === false}>Save Equipment</Button>
       {isLoading && <LoadingOverlay />}
+
+      <h2>Equipment List</h2>
+      <EquipmentList>
+        {equipmentList.map(item => (
+          <EquipmentItem key={item.id}>
+            <EquipmentImage src={item.imageUrl} alt={item.name} />
+            <EquipmentName>{item.name}</EquipmentName>
+            <DeleteButton onClick={() => item.id && handleDelete(item.id)} disabled={isLoading}>
+              <FaTrash />
+            </DeleteButton>
+          </EquipmentItem>
+        ))}
+      </EquipmentList>
     </FormContainer>
   );
 };
