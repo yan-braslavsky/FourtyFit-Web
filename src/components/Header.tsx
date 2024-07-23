@@ -10,12 +10,6 @@ const HeaderContainer = styled.header`
   color: ${props => props.theme.colors.textLight};
   padding: 2rem 0;
   text-align: center;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
 `;
 
 const HeaderTitle = styled.h1`
@@ -26,12 +20,6 @@ const HeaderTitle = styled.h1`
 const NavContainer = styled.nav`
   background-color: ${props => props.theme.colors.secondary};
   padding: 1rem 0;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
 `;
 
 const NavList = styled.ul`
@@ -40,19 +28,13 @@ const NavList = styled.ul`
   list-style-type: none;
   margin: 0;
   padding: 0;
-  max-width: 1200px;
-  margin: 0 auto;
 `;
 
 const NavItem = styled.li`
   margin: 0 1rem;
 `;
 
-interface NavLinkProps {
-  isActive: boolean;
-}
-
-const NavLink = styled(Link)<NavLinkProps>`
+const NavLink = styled(Link)<{ $isActive: boolean }>`
   color: ${props => props.theme.colors.textLight};
   text-decoration: none;
   font-size: 1.2rem;
@@ -62,7 +44,7 @@ const NavLink = styled(Link)<NavLinkProps>`
   border-radius: 4px;
   transition: background-color 0.3s ease;
 
-  background-color: ${props => props.isActive ? props.theme.colors.accent : 'transparent'};
+  background-color: ${props => props.$isActive ? props.theme.colors.accent : 'transparent'};
 
   &:hover {
     background-color: ${props => props.theme.colors.accent};
@@ -84,16 +66,24 @@ const Header: React.FC = () => {
       <NavContainer>
         <NavList>
           <NavItem>
-            <NavLink to="/workouts" isActive={location.pathname === '/workouts'}><FaListUl /> Workouts</NavLink>
+            <NavLink to="/workouts" $isActive={location.pathname === '/workouts'}>
+              <FaListUl /> Workouts
+            </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/create-workout" isActive={location.pathname === '/create-workout'}><FaDumbbell /> Create Workout</NavLink>
+            <NavLink to="/create-workout" $isActive={location.pathname === '/create-workout'}>
+              <FaDumbbell /> Create Workout
+            </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/equipment" isActive={location.pathname === '/equipment'}><GiGymBag /> Add Equipment</NavLink>
+            <NavLink to="/equipment" $isActive={location.pathname === '/equipment'}>
+              <GiGymBag /> Add Equipment
+            </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/exercises" isActive={location.pathname === '/exercises'}><FaRunning /> Add Exercise</NavLink>
+            <NavLink to="/exercises" $isActive={location.pathname === '/exercises'}>
+              <FaRunning /> Add Exercise
+            </NavLink>
           </NavItem>
         </NavList>
       </NavContainer>
