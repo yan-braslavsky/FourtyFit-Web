@@ -88,7 +88,7 @@ const EquipmentForm: React.FC = () => {
       try {
         let imageUrl = '';
         if (croppedImage) {
-          imageUrl = await uploadImage(croppedImage, `equipment/${Date.now()}.jpg`);
+          imageUrl = await uploadImage(croppedImage, `equipment/${Date.now()}.png`);
         }
         await saveEquipment({ ...equipment, imageUrl });
         alert('Equipment saved successfully');

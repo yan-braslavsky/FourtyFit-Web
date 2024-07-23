@@ -5,7 +5,10 @@ import { storage } from '../firebase/config';
 export const uploadImage = async (file: Blob, path: string): Promise<string> => {
   try {
     const storageRef = ref(storage, path);
-    const snapshot = await uploadBytes(storageRef, file);
+    const metadata = {
+      contentType: 'image/png',
+    };
+    const snapshot = await uploadBytes(storageRef, file, metadata);
     return await getDownloadURL(snapshot.ref);
   } catch (error) {
     console.error('Error uploading image:', error);
