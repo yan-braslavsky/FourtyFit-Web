@@ -9,15 +9,21 @@ import WorkoutForm from './components/WorkoutForm';
 import WorkoutList from './components/WorkoutList';
 import { theme } from './styles/theme';
 import styled from 'styled-components';
+import { Navigate } from 'react-router-dom';
+import Footer from './components/Footer';
 
 const AppContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ContentContainer = styled.main`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  flex-grow: 1;
 `;
 
 const App: React.FC = () => {
@@ -28,13 +34,15 @@ const App: React.FC = () => {
           <Header />
           <ContentContainer>
             <Routes>
-              <Route path="/" element={<WorkoutList />} />
+              <Route path="/" element={<Navigate replace to="/workouts" />} />
+              <Route path="/workouts" element={<WorkoutList />} />
               <Route path="/create-workout" element={<WorkoutForm />} />
               <Route path="/edit-workout/:id" element={<WorkoutForm />} />
               <Route path="/equipment" element={<EquipmentForm />} />
               <Route path="/exercises" element={<ExerciseForm />} />
             </Routes>
           </ContentContainer>
+          <Footer />
         </AppContainer>
       </Router>
     </ThemeProvider>

@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaListUl, FaDumbbell, FaRunning } from 'react-icons/fa';
 import { GiGymBag } from 'react-icons/gi';
 
@@ -48,15 +48,24 @@ const NavItem = styled.li`
   margin: 0 1rem;
 `;
 
-const NavLink = styled(Link)`
+interface NavLinkProps {
+  isActive: boolean;
+}
+
+const NavLink = styled(Link)<NavLinkProps>`
   color: ${props => props.theme.colors.textLight};
   text-decoration: none;
   font-size: 1.2rem;
   display: flex;
   align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+
+  background-color: ${props => props.isActive ? props.theme.colors.accent : 'transparent'};
 
   &:hover {
-    text-decoration: underline;
+    background-color: ${props => props.theme.colors.accent};
   }
 
   svg {
@@ -65,6 +74,8 @@ const NavLink = styled(Link)`
 `;
 
 const Header: React.FC = () => {
+  const location = useLocation();
+
   return (
     <>
       <HeaderContainer>
@@ -73,16 +84,16 @@ const Header: React.FC = () => {
       <NavContainer>
         <NavList>
           <NavItem>
-            <NavLink to="/"><FaListUl /> Workouts</NavLink>
+            <NavLink to="/workouts" isActive={location.pathname === '/workouts'}><FaListUl /> Workouts</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/create-workout"><FaDumbbell /> Create Workout</NavLink>
+            <NavLink to="/create-workout" isActive={location.pathname === '/create-workout'}><FaDumbbell /> Create Workout</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/equipment"><GiGymBag /> Add Equipment</NavLink>
+            <NavLink to="/equipment" isActive={location.pathname === '/equipment'}><GiGymBag /> Add Equipment</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/exercises"><FaRunning /> Add Exercise</NavLink>
+            <NavLink to="/exercises" isActive={location.pathname === '/exercises'}><FaRunning /> Add Exercise</NavLink>
           </NavItem>
         </NavList>
       </NavContainer>
