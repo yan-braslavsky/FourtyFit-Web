@@ -66,7 +66,6 @@ const EquipmentForm: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment>({ name: '', description: '', imageUrl: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isNameValid, setIsNameValid] = useState<boolean | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -103,12 +102,10 @@ const EquipmentForm: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
-      setCroppedImage(null);
     }
   };
 
   const handleCrop = (croppedImageBlob: Blob) => {
-    setCroppedImage(croppedImageBlob);
     setErrors({ ...errors, image: '' });
   };
 
@@ -129,7 +126,6 @@ const EquipmentForm: React.FC = () => {
         let croppedImageBlob: Blob | null = null;
         if (cropperRef.current) {
           croppedImageBlob = await cropperRef.current.cropImage();
-          setCroppedImage(croppedImageBlob);
         }
         
         let imageUrl = '';
@@ -139,7 +135,6 @@ const EquipmentForm: React.FC = () => {
         await saveEquipment({ ...equipment, imageUrl });
         alert('Equipment saved successfully');
         setEquipment({ name: '', description: '', imageUrl: '' });
-        setCroppedImage(null);
         setImageFile(null);
         setIsNameValid(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
