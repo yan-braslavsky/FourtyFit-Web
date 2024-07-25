@@ -1,16 +1,16 @@
-// src/components/App.tsx
+// src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Corrected import order
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import EquipmentForm from './components/EquipmentForm';
 import ExerciseForm from './components/ExerciseForm';
+import ExerciseList from './components/ExerciseList';
 import WorkoutForm from './components/WorkoutForm';
 import WorkoutList from './components/WorkoutList';
 import { theme } from './styles/theme';
 import styled from 'styled-components';
-import { Navigate } from 'react-router-dom';
-import Footer from './components/Footer';
 
 const AppContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
@@ -39,7 +39,9 @@ const App: React.FC = () => {
               <Route path="/create-workout" element={<WorkoutForm />} />
               <Route path="/edit-workout/:id" element={<WorkoutForm />} />
               <Route path="/equipment" element={<EquipmentForm />} />
-              <Route path="/exercises" element={<ExerciseForm />} />
+              <Route path="/exercises" element={<ExerciseList />} />
+              <Route path="/add-exercise" element={<ExerciseForm />} />
+              <Route path="/edit-exercise/:id" element={<ExerciseForm />} />
             </Routes>
           </ContentContainer>
           <Footer />
