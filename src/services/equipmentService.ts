@@ -1,8 +1,6 @@
 // src/services/equipmentService.ts
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
-import { httpsCallable,HttpsCallableResult } from 'firebase/functions';
 import { db } from '../firebase/config';
-import { functions } from '../firebase/config';
 
 export interface Equipment {
   id?: string;
@@ -25,24 +23,31 @@ export const checkEquipmentExists = async (name: string): Promise<boolean> => {
 };
 
 export const saveEquipment = async (equipment: Equipment): Promise<void> => {
-  const addEquipmentFunction = httpsCallable(functions, 'addEquipment');
-  await addEquipmentFunction(equipment);
+  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/addEquipment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(equipment),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to save equipment');
+  }
 };
 
 export const deleteEquipment = async (id: string): Promise<void> => {
-  const deleteEquipmentFunction = httpsCallable(functions, 'deleteEquipment');
-  try {
-    const result: HttpsCallableResult = await deleteEquipmentFunction({ id });
-    console.log("Delete equipment result:", result.data);
-    if (!result.data || !(result.data as any).success) {
-      throw new Error('Failed to delete equipment: Operation did not return success');
-    }
-  } catch (error) {
-    console.error('Error in deleteEquipment:', error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to delete equipment: ${error.message}`);
-    } else {
-      throw new Error('Failed to delete equipment: Unknown error');
-    }
+  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/removeEquipment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to delete equipment');
   }
 };
