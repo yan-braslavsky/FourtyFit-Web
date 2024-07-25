@@ -26,10 +26,46 @@ export const getExercise = async (id: string): Promise<Exercise> => {
 };
 
 export const saveExercise = async (exercise: Exercise): Promise<void> => {
-  if (exercise.id) {
-    await setDoc(doc(db, 'exercises', exercise.id), exercise);
-  } else {
-    const newExerciseRef = doc(collection(db, 'exercises'));
-    await setDoc(newExerciseRef, exercise);
+  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/addExercise', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(exercise),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to save exercise');
+  }
+};
+
+export const updateExercise = async (exercise: Exercise): Promise<void> => {
+  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/updateExercise', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(exercise),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to update exercise');
+  }
+};
+
+export const deleteExercise = async (id: string): Promise<void> => {
+  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/removeExercise', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to delete exercise');
   }
 };
