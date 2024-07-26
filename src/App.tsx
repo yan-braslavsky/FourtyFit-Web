@@ -5,6 +5,7 @@ import { ThemeProvider } from 'styled-components';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import EquipmentForm from './components/EquipmentForm';
+import EquipmentList from './components/EquipmentList';
 import ExerciseForm from './components/ExerciseForm';
 import ExerciseList from './components/ExerciseList';
 import WorkoutForm from './components/WorkoutForm';
@@ -38,7 +39,9 @@ const App: React.FC = () => {
               <Route path="/workouts" element={<WorkoutList />} />
               <Route path="/create-workout" element={<WorkoutForm />} />
               <Route path="/edit-workout/:id" element={<WorkoutForm />} />
-              <Route path="/equipment" element={<EquipmentForm />} />
+              <Route path="/equipment" element={<EquipmentList />} />
+              <Route path="/add-equipment" element={<EquipmentForm />} />
+              <Route path="/edit-equipment/:id" element={<EquipmentForm />} />
               <Route path="/exercises" element={<ExerciseList />} />
               <Route path="/add-exercise" element={<ExerciseForm />} />
               <Route path="/edit-exercise/:id" element={<ExerciseForm />} />

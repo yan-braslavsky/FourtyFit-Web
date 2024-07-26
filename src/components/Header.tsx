@@ -77,12 +77,12 @@ const Header: React.FC = () => {
           </NavItem>
           <NavItem>
             <NavLink to="/equipment" $isActive={location.pathname === '/equipment'}>
-              <GiGymBag /> Add Equipment
+              <GiGymBag /> Equipment
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink to="/exercises" $isActive={location.pathname === '/exercises'}>
-              <FaRunning /> Add Exercise
+              <FaRunning /> Exercises
             </NavLink>
           </NavItem>
         </NavList>

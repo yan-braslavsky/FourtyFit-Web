@@ -1,5 +1,5 @@
 // src/services/exerciseService.ts
-import { collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 export interface Exercise {
