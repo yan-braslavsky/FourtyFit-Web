@@ -5,7 +5,7 @@ import { db, storage } from "./admin";
 
 const corsHandler = cors({ origin: true });
 
-export const addEquipment = (request: functions.https.Request, response: functions.Response) => {
+export const addEquipment = functions.https.onRequest((request, response) => {
   corsHandler(request, response, async () => {
     try {
       const { name, description, imageUrl } = request.body;
@@ -31,9 +31,37 @@ export const addEquipment = (request: functions.https.Request, response: functio
       }
     }
   });
-};
+});
 
-export const removeEquipment = (request: functions.https.Request, response: functions.Response) => {
+export const updateEquipment = functions.https.onRequest((request, response) => {
+  corsHandler(request, response, async () => {
+    try {
+      const { id, name, description, imageUrl } = request.body;
+
+      if (!id || !name || !description || !imageUrl) {
+        throw new functions.https.HttpsError("invalid-argument", "Missing required fields");
+      }
+
+      const equipmentRef = db.collection("equipment").doc(id);
+      await equipmentRef.update({
+        name,
+        description,
+        imageUrl,
+      });
+
+      response.status(200).send({ success: true });
+    } catch (error) {
+      console.error("Error in updateEquipment function:", error);
+      if (error instanceof Error) {
+        response.status(500).send({ error: error.message });
+      } else {
+        response.status(500).send({ error: "An unknown error occurred" });
+      }
+    }
+  });
+});
+
+export const removeEquipment = functions.https.onRequest((request, response) => {
   corsHandler(request, response, async () => {
     try {
       const { id } = request.body;
@@ -93,4 +121,4 @@ export const removeEquipment = (request: functions.https.Request, response: func
       }
     }
   });
-};
+});

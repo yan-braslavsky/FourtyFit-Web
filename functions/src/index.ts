@@ -4,6 +4,7 @@ import * as equipmentFunctions from "./equipment";
 import * as exerciseFunctions from "./exercises";
 
 export const addEquipment = functions.https.onRequest(equipmentFunctions.addEquipment);
+export const updateEquipment = functions.https.onRequest(equipmentFunctions.updateEquipment);
 export const removeEquipment = functions.https.onRequest(equipmentFunctions.removeEquipment);
 
 export const addExercise = functions.https.onRequest(exerciseFunctions.addExercise);

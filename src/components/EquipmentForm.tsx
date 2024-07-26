@@ -107,6 +107,7 @@ const EquipmentForm: React.FC = () => {
     e.preventDefault();
     if (validateForm()) {
       setIsLoading(true);
+      setErrors({});
       try {
         let imageUrl = equipment.imageUrl;
         if (imageFile && cropperRef.current) {
@@ -126,7 +127,7 @@ const EquipmentForm: React.FC = () => {
         navigate('/equipment');
       } catch (error) {
         console.error('Error saving equipment:', error);
-        alert('Failed to save equipment');
+        setErrors({ submit: 'Failed to save equipment. Please try again.' });
       } finally {
         setIsLoading(false);
       }
@@ -181,7 +182,10 @@ const EquipmentForm: React.FC = () => {
           ref={cropperRef}
         />
       )}
-      <Button type="submit" disabled={isLoading}>Save Equipment</Button>
+      {errors.submit && <ErrorMessage>{errors.submit}</ErrorMessage>}
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? 'Saving...' : 'Save Equipment'}
+      </Button>
     </FormContainer>
   );
 };
