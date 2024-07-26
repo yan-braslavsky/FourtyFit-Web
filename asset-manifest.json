@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/FourtyFit-Web/static/css/main.e6c13ad2.css",
-    "main.js": "/FourtyFit-Web/static/js/main.ee7ae611.js",
+    "main.js": "/FourtyFit-Web/static/js/main.ae020647.js",
     "static/js/453.64663f9d.chunk.js": "/FourtyFit-Web/static/js/453.64663f9d.chunk.js",
     "index.html": "/FourtyFit-Web/index.html",
     "main.e6c13ad2.css.map": "/FourtyFit-Web/static/css/main.e6c13ad2.css.map",
-    "main.ee7ae611.js.map": "/FourtyFit-Web/static/js/main.ee7ae611.js.map",
+    "main.ae020647.js.map": "/FourtyFit-Web/static/js/main.ae020647.js.map",
     "453.64663f9d.chunk.js.map": "/FourtyFit-Web/static/js/453.64663f9d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.ee7ae611.js"
+    "static/js/main.ae020647.js"
   ]
 }
