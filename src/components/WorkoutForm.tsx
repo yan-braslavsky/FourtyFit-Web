@@ -66,20 +66,11 @@ const GroupListItem = styled.li`
   margin-bottom: 0.5rem;
 `;
 
-const GroupInfo = styled.span`
-  flex-grow: 1;
-  margin-right: 1rem; // Add space between text and buttons
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 0.5rem; // Add space between buttons
-`;
-
 const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 1rem;
 `;
+
 
 enum FormStage {
   TITLE,
@@ -96,15 +87,21 @@ const WorkoutForm: React.FC = () => {
   const [formStage, setFormStage] = useState<FormStage>(FormStage.TITLE);
   const [titleError, setTitleError] = useState<string>('');
   const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(null);
-
+  const [error, setError] = useState<string | null>(null);
+  
   useEffect(() => {
     const fetchData = async () => {
-      const fetchedExercises = await getExercises();
-      setExercises(fetchedExercises);
+      try {
+        const fetchedExercises = await getExercises();
+        setExercises(fetchedExercises);
 
-      if (id) {
-        const fetchedWorkout = await getWorkout(id);
-        setWorkout(fetchedWorkout);
+        if (id) {
+          const fetchedWorkout = await getWorkout(id);
+          setWorkout(fetchedWorkout);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data. Please try again.');
       }
     };
     fetchData();
@@ -113,7 +110,7 @@ const WorkoutForm: React.FC = () => {
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setWorkout({ ...workout, name: newTitle });
-
+    
     if (newTitle.trim() !== '') {
       const exists = await checkWorkoutExists(newTitle);
       if (exists && newTitle !== workout.name) {
@@ -161,6 +158,7 @@ const WorkoutForm: React.FC = () => {
       }));
     }
     setCurrentGroup({ exercises: [], sets: 1 });
+    setFormStage(FormStage.REVIEW);
   };
 
   const handleEditGroup = (index: number) => {
@@ -178,13 +176,19 @@ const WorkoutForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     try {
-      await saveWorkout(workout);
-      alert('Workout saved successfully');
-      navigate('/');
+      const savedWorkout = await saveWorkout(workout);
+      
+      // Optimistically update the UI
+      setWorkout(savedWorkout);
+
+      // Navigate back to the workouts list
+      navigate('/workouts');
     } catch (error) {
       console.error('Error saving workout:', error);
-      alert('Failed to save workout');
+      setError('Failed to save workout. Please try again.');
     }
   };
 
@@ -208,11 +212,11 @@ const WorkoutForm: React.FC = () => {
 
   const renderGroupStage = () => (
     <>
-      <BackButton type="button" onClick={() => setFormStage(FormStage.TITLE)}>
+      <BackButton type="button" onClick={() => setFormStage(FormStage.REVIEW)}>
         <FaArrowLeft /> Back
       </BackButton>
       <h3>Exercise Group {editingGroupIndex !== null ? editingGroupIndex + 1 : workout.exerciseGroups.length + 1}</h3>
-
+      
       <Label htmlFor="groupSets">Number of Sets</Label>
       <Select
         id="groupSets"
@@ -266,55 +270,34 @@ const WorkoutForm: React.FC = () => {
         Add Another Exercise to Group
       </Button>
 
-      {currentGroup.exercises.length > 0 && (
-        <Button type="button" onClick={handleAddGroup}>
-          {editingGroupIndex !== null ? 'Update Group' : 'Add Group to Workout'}
-        </Button>
-      )}
-
-      {workout.exerciseGroups.length > 0 && (
-        <>
-          <h3>Current Groups</h3>
-          <GroupList>
-            {workout.exerciseGroups.map((group, index) => (
-              <GroupListItem key={index}>
-                <GroupInfo>Group {index + 1} - {group.sets} sets, {group.exercises.length} exercises</GroupInfo>
-                <ButtonGroup>
-                  <Button onClick={() => handleEditGroup(index)}><FaEdit /></Button>
-                  <Button onClick={() => handleDeleteGroup(index)}><FaTrash /></Button>
-                </ButtonGroup>
-              </GroupListItem>
-            ))}
-          </GroupList>
-        </>
-      )}
-
-      {workout.exerciseGroups.length > 0 && (
-        <Button type="button" onClick={() => setFormStage(FormStage.REVIEW)}>
-          Review Workout
-        </Button>
-      )}
+      <Button type="button" onClick={handleAddGroup}>
+        {editingGroupIndex !== null ? 'Update Group' : 'Add Group to Workout'}
+      </Button>
     </>
   );
 
   const renderReviewStage = () => (
     <>
-      <BackButton type="button" onClick={() => setFormStage(FormStage.GROUP)}>
-        <FaArrowLeft /> Back
+      <BackButton type="button" onClick={() => setFormStage(FormStage.TITLE)}>
+        <FaArrowLeft /> Back to Title
       </BackButton>
       <h3>Review Workout</h3>
       <GroupList>
         {workout.exerciseGroups.map((group, groupIndex) => (
           <GroupListItem key={groupIndex}>
-            <GroupInfo>Group {groupIndex + 1} - {group.sets} sets, {group.exercises.length} exercises</GroupInfo>
-            <ButtonGroup>
+            <span>Group {groupIndex + 1} - {group.sets} sets, {group.exercises.length} exercises</span>
+            <div>
               <Button onClick={() => handleEditGroup(groupIndex)}><FaEdit /></Button>
               <Button onClick={() => handleDeleteGroup(groupIndex)}><FaTrash /></Button>
-            </ButtonGroup>
+            </div>
           </GroupListItem>
         ))}
       </GroupList>
-      <Button type="button" onClick={() => setFormStage(FormStage.GROUP)}>
+      <Button type="button" onClick={() => {
+        setEditingGroupIndex(null);
+        setCurrentGroup({ exercises: [], sets: 1 });
+        setFormStage(FormStage.GROUP);
+      }}>
         Add Another Group
       </Button>
       <Button type="submit">Save Workout</Button>
@@ -324,6 +307,7 @@ const WorkoutForm: React.FC = () => {
   return (
     <FormContainer onSubmit={handleSubmit}>
       <h2>{id ? 'Edit Workout' : 'Create Workout'}</h2>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       {formStage === FormStage.TITLE && renderTitleStage()}
       {formStage === FormStage.GROUP && renderGroupStage()}
       {formStage === FormStage.REVIEW && renderReviewStage()}

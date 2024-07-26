@@ -34,13 +34,20 @@ export const getWorkout = async (id: string): Promise<Workout> => {
   return { id: workoutSnapshot.id, ...workoutSnapshot.data() } as Workout;
 };
 
-export const saveWorkout = async (workout: Workout): Promise<void> => {
+export const saveWorkout = async (workout: Workout): Promise<Workout> => {
   if (workout.id) {
     await setDoc(doc(db, 'workouts', workout.id), workout);
+    return workout;
   } else {
     const newWorkoutRef = doc(collection(db, 'workouts'));
-    await setDoc(newWorkoutRef, workout);
+    const newWorkout = { ...workout, id: newWorkoutRef.id };
+    await setDoc(newWorkoutRef, newWorkout);
+    return newWorkout;
   }
+};
+
+export const deleteWorkout = async (id: string): Promise<void> => {
+  await deleteDoc(doc(db, 'workouts', id));
 };
 
 export const checkWorkoutExists = async (name: string): Promise<boolean> => {
@@ -48,8 +55,4 @@ export const checkWorkoutExists = async (name: string): Promise<boolean> => {
   const q = query(workoutsCol, where('name', '==', name), limit(1));
   const querySnapshot = await getDocs(q);
   return !querySnapshot.empty;
-};
-
-export const deleteWorkout = async (id: string): Promise<void> => {
-  await deleteDoc(doc(db, 'workouts', id));
 };
