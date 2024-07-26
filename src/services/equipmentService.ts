@@ -1,5 +1,5 @@
 // src/services/equipmentService.ts
-import { collection, getDocs, query, where, limit } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where, limit } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 export interface Equipment {
@@ -13,6 +13,15 @@ export const getEquipment = async (): Promise<Equipment[]> => {
   const equipmentCol = collection(db, 'equipment');
   const equipmentSnapshot = await getDocs(equipmentCol);
   return equipmentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Equipment));
+};
+
+export const getEquipmentById = async (id: string): Promise<Equipment> => {
+  const equipmentDoc = doc(db, 'equipment', id);
+  const equipmentSnapshot = await getDoc(equipmentDoc);
+  if (!equipmentSnapshot.exists()) {
+    throw new Error('Equipment not found');
+  }
+  return { id: equipmentSnapshot.id, ...equipmentSnapshot.data() } as Equipment;
 };
 
 export const checkEquipmentExists = async (name: string): Promise<boolean> => {
@@ -34,6 +43,25 @@ export const saveEquipment = async (equipment: Equipment): Promise<void> => {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || 'Failed to save equipment');
+  }
+};
+
+export const updateEquipment = async (equipment: Equipment): Promise<void> => {
+  if (!equipment.id) {
+    throw new Error('Equipment ID is required for updating');
+  }
+
+  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/updateEquipment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(equipment),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to update equipment');
   }
 };
 
