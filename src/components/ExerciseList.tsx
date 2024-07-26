@@ -94,6 +94,7 @@ const AddExerciseButton = styled(Link)`
   border-radius: 4px;
   text-decoration: none;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 
   &:hover {
     background-color: ${props => props.theme.colors.secondary};
@@ -167,6 +168,7 @@ const ExerciseList: React.FC = () => {
   return (
     <ExerciseListContainer>
       <h2>Exercises</h2>
+      <AddExerciseButton to="/add-exercise">Add New Exercise</AddExerciseButton>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {exercises.map(exercise => (
         <ExerciseItem key={exercise.id}>
@@ -192,7 +194,6 @@ const ExerciseList: React.FC = () => {
           </ExerciseHeader>
         </ExerciseItem>
       ))}
-      <AddExerciseButton to="/add-exercise">Add New Exercise</AddExerciseButton>
     </ExerciseListContainer>
   );
 };
