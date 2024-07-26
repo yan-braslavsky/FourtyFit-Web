@@ -42,13 +42,53 @@ export const updateEquipment = functions.https.onRequest((request, response) => 
         throw new functions.https.HttpsError("invalid-argument", "Missing required fields");
       }
 
+      console.log(`Updating equipment with id: ${id}`);
+      console.log(`New image URL: ${imageUrl}`);
+
       const equipmentRef = db.collection("equipment").doc(id);
+      const oldEquipment = await equipmentRef.get();
+
+      if (!oldEquipment.exists) {
+        throw new functions.https.HttpsError("not-found", "Equipment not found");
+      }
+
+      const oldData = oldEquipment.data();
+      console.log("Old equipment data:", oldData);
+
+      if (oldData && oldData.imageUrl !== imageUrl) {
+        console.log("Image URL has changed. Attempting to delete old image.");
+        const oldImageUrl = oldData.imageUrl;
+        const oldImageFileName = oldImageUrl.split("/").pop();
+        if (oldImageFileName) {
+          const bucket = storage.bucket();
+          const file = bucket.file(`equipment/${oldImageFileName}`);
+
+          try {
+            const [exists] = await file.exists();
+            if (exists) {
+              await file.delete();
+              console.log(`Old image ${oldImageFileName} deleted successfully`);
+            } else {
+              console.log(`Old image ${oldImageFileName} does not exist in storage`);
+            }
+          } catch (deleteError) {
+            console.error("Error deleting old image:", deleteError);
+            // Continue with update even if image deletion fails
+          }
+        } else {
+          console.log("Could not extract filename from old image URL:", oldImageUrl);
+        }
+      } else {
+        console.log("Image URL has not changed. Skipping image deletion.");
+      }
+
       await equipmentRef.update({
         name,
         description,
         imageUrl,
       });
 
+      console.log("Equipment updated successfully");
       response.status(200).send({ success: true });
     } catch (error) {
       console.error("Error in updateEquipment function:", error);

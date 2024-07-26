@@ -5,7 +5,7 @@ import { db, storage } from "./admin";
 
 const corsHandler = cors({ origin: true });
 
-export const addExercise = (request: functions.https.Request, response: functions.Response) => {
+export const addExercise = functions.https.onRequest((request, response) => {
   corsHandler(request, response, async () => {
     try {
       const { name, description, imageUrl, equipmentIds } = request.body;
@@ -32,9 +32,9 @@ export const addExercise = (request: functions.https.Request, response: function
       }
     }
   });
-};
+});
 
-export const updateExercise = (request: functions.https.Request, response: functions.Response) => {
+export const updateExercise = functions.https.onRequest((request, response) => {
   corsHandler(request, response, async () => {
     try {
       const { id, name, description, imageUrl, equipmentIds } = request.body;
@@ -44,6 +44,30 @@ export const updateExercise = (request: functions.https.Request, response: funct
       }
 
       const exerciseRef = db.collection("exercises").doc(id);
+      const oldExercise = await exerciseRef.get();
+
+      if (!oldExercise.exists) {
+        throw new functions.https.HttpsError("not-found", "Exercise not found");
+      }
+
+      const oldData = oldExercise.data();
+
+      // Check if the image URL has changed
+      if (oldData && oldData.imageUrl !== imageUrl) {
+        // Delete the old image
+        const oldImageFileName = oldData.imageUrl.split("/").pop();
+        if (oldImageFileName) {
+          const bucket = storage.bucket();
+          try {
+            await bucket.file(`exercises/${oldImageFileName}`).delete();
+            console.log("Old image deleted successfully");
+          } catch (deleteError) {
+            console.error("Error deleting old image:", deleteError);
+            // Continue with update even if image deletion fails
+          }
+        }
+      }
+
       await exerciseRef.update({
         name,
         description,
@@ -61,9 +85,9 @@ export const updateExercise = (request: functions.https.Request, response: funct
       }
     }
   });
-};
+});
 
-export const removeExercise = (request: functions.https.Request, response: functions.Response) => {
+export const removeExercise = functions.https.onRequest((request, response) => {
   corsHandler(request, response, async () => {
     try {
       const { id } = request.body;
@@ -123,4 +147,4 @@ export const removeExercise = (request: functions.https.Request, response: funct
       }
     }
   });
-};
+});
