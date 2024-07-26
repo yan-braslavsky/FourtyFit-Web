@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getExercises, deleteExercise, Exercise } from '../services/exerciseService';
 import { getEquipment, Equipment } from '../services/equipmentService';
 import LoadingOverlay from './LoadingOverlay';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 
 const ExerciseListContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
@@ -13,6 +13,34 @@ const ExerciseListContainer = styled.div`
   border-radius: 8px;
   max-width: 800px;
   margin: 2rem auto;
+`;
+
+const TopBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const SearchBar = styled.div`
+  display: flex;
+  align-items: center;
+  background-color: ${props => props.theme.colors.card};
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  max-width: 300px;
+`;
+
+const SearchInput = styled.input`
+  border: none;
+  background: transparent;
+  margin-left: 0.5rem;
+  flex-grow: 1;
+  font-size: 1rem;
+  &:focus {
+    outline: none;
+  }
 `;
 
 const ExerciseItem = styled.div`
@@ -93,8 +121,6 @@ const AddExerciseButton = styled(Link)`
   padding: 0.5rem 1rem;
   border-radius: 4px;
   text-decoration: none;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
 
   &:hover {
     background-color: ${props => props.theme.colors.secondary};
@@ -111,6 +137,7 @@ const ExerciseList: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -161,16 +188,36 @@ const ExerciseList: React.FC = () => {
     });
   };
 
+  const filteredExercises = exercises.filter(exercise =>
+    exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    exercise.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getEquipmentNames(exercise.equipmentIds).some(name => 
+      name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
   if (isLoading) {
     return <LoadingOverlay />;
   }
 
   return (
     <ExerciseListContainer>
+      <TopBar>
+        <SearchBar>
+          <FaSearch />
+          <SearchInput
+            type="text"
+            placeholder="Search exercises..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </SearchBar>
+        <AddExerciseButton to="/add-exercise">Add New Exercise</AddExerciseButton>
+      </TopBar>
+      
       <h2>Exercises</h2>
-      <AddExerciseButton to="/add-exercise">Add New Exercise</AddExerciseButton>
       {error && <ErrorMessage>{error}</ErrorMessage>}
-      {exercises.map(exercise => (
+      {filteredExercises.map(exercise => (
         <ExerciseItem key={exercise.id}>
           <ExerciseHeader>
             <ExerciseImage src={exercise.imageUrl} alt={exercise.name} />
