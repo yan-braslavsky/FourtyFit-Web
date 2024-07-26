@@ -25,7 +25,7 @@ export const getExercise = async (id: string): Promise<Exercise> => {
   return { id: exerciseSnapshot.id, ...exerciseSnapshot.data() } as Exercise;
 };
 
-export const saveExercise = async (exercise: Exercise): Promise<void> => {
+export const saveExercise = async (exercise: Exercise): Promise<Exercise> => {
   const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/addExercise', {
     method: 'POST',
     headers: {
@@ -38,6 +38,9 @@ export const saveExercise = async (exercise: Exercise): Promise<void> => {
     const errorData = await response.json();
     throw new Error(errorData.error || 'Failed to save exercise');
   }
+
+  const result = await response.json();
+  return { ...exercise, id: result.id };
 };
 
 export const updateExercise = async (exercise: Exercise): Promise<void> => {

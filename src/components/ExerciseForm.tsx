@@ -6,7 +6,6 @@ import { saveExercise, updateExercise, getExercise, Exercise } from '../services
 import { getEquipment, Equipment } from '../services/equipmentService';
 import { uploadImage } from '../services/storageService';
 import ImageCropper from './ImageCropper';
-import LoadingOverlay from './LoadingOverlay';
 import { FaArrowLeft } from 'react-icons/fa';
 
 const FormContainer = styled.form`
@@ -72,13 +71,11 @@ const ExerciseForm: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
         const fetchedEquipment = await getEquipment();
         setEquipment(fetchedEquipment);
@@ -90,8 +87,6 @@ const ExerciseForm: React.FC = () => {
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data. Please try again.');
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchData();
@@ -116,7 +111,6 @@ const ExerciseForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsLoading(true);
 
     try {
       let imageUrl = exercise.imageUrl;
@@ -129,28 +123,29 @@ const ExerciseForm: React.FC = () => {
       const exerciseData = { ...exercise, imageUrl };
 
       if (id) {
-        await updateExercise(exerciseData);
+        // Update existing exercise
+        setExercise(exerciseData);
+        updateExercise(exerciseData).catch(error => {
+          console.error('Error updating exercise:', error);
+          setError('Failed to update exercise. Please try again.');
+          setExercise(exercise);
+        });
       } else {
-        await saveExercise(exerciseData);
+        // Create new exercise
+        const newExercise = await saveExercise(exerciseData);
+        setExercise(newExercise);
       }
 
-      alert('Exercise saved successfully');
       navigate('/exercises');
-    } catch (err) {
-      console.error('Error saving exercise:', err);
+    } catch (error) {
+      console.error('Error saving exercise:', error);
       setError('Failed to save exercise. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleBack = () => {
     navigate('/exercises');
   };
-
-  if (isLoading) {
-    return <LoadingOverlay />;
-  }
 
   return (
     <FormContainer onSubmit={handleSubmit}>
@@ -202,7 +197,7 @@ const ExerciseForm: React.FC = () => {
           ref={cropperRef}
         />
       )}
-      <Button type="submit" disabled={isLoading}>Save Exercise</Button>
+      <Button type="submit">Save Exercise</Button>
     </FormContainer>
   );
 };
