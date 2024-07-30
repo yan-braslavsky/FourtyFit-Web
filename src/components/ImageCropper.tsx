@@ -1,5 +1,5 @@
 // src/components/ImageCropper.tsx
-import { useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useState, useCallback, forwardRef, useImperativeHandle, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
 import styled from 'styled-components';
@@ -12,7 +12,7 @@ const CropperContainer = styled.div`
 `;
 
 interface ImageCropperProps {
-  imageFile: File;
+  imageFile: File | string;
   onCrop: (croppedImage: Blob) => void;
 }
 
@@ -24,31 +24,45 @@ const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(({ imageFile
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof imageFile === 'string') {
+      setImageUrl(imageFile);
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageUrl(reader.result as string);
+      };
+      reader.readAsDataURL(imageFile);
+    }
+  }, [imageFile]);
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
   const cropImage = useCallback(async () => {
-    if (croppedAreaPixels) {
-      const croppedImage = await getCroppedImg(
-        URL.createObjectURL(imageFile),
-        croppedAreaPixels
-      );
+    if (croppedAreaPixels && imageUrl) {
+      const croppedImage = await getCroppedImg(imageUrl, croppedAreaPixels);
       onCrop(croppedImage);
       return croppedImage;
     }
     throw new Error('No area to crop');
-  }, [imageFile, croppedAreaPixels, onCrop]);
+  }, [imageUrl, croppedAreaPixels, onCrop]);
 
   useImperativeHandle(ref, () => ({
     cropImage
   }));
 
+  if (!imageUrl) {
+    return null;
+  }
+
   return (
     <CropperContainer>
       <Cropper
-        image={URL.createObjectURL(imageFile)}
+        image={imageUrl}
         crop={crop}
         zoom={zoom}
         aspect={1}
@@ -86,7 +100,6 @@ const getCroppedImg = async (
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
 
-  // Fill the canvas with a transparent background
   ctx.fillStyle = 'rgba(0, 0, 0, 0)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 

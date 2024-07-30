@@ -1,6 +1,6 @@
 // functions/src/exercises.ts
 import * as functions from "firebase-functions";
-import * as cors from "cors";
+import cors from "cors";
 import { db, storage } from "./admin";
 
 const corsHandler = cors({ origin: true });

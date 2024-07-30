@@ -1,0 +1,221 @@
+{
+  "Back": {
+    "muscles": [
+      {
+        "name": "Lats",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The latissimus dorsi, or 'lats', is a large muscle in the back that helps with shoulder movements."
+      },
+      {
+        "name": "Rhomboids",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The rhomboids are muscles between the shoulder blades that retract the scapula."
+      },
+      {
+        "name": "Traps",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The trapezius muscles extend from the neck to the middle of the back and help move and stabilize the shoulder blades."
+      },
+      {
+        "name": "Erector Spinae",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The erector spinae is a group of muscles that extend and rotate the spine."
+      },
+      {
+        "name": "Teres Major",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The teres major muscle assists with the movement of the shoulder joint."
+      },
+      {
+        "name": "Teres Minor",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The teres minor is a small muscle that helps with shoulder rotation and stabilization."
+      }
+    ],
+    "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+  },
+  "Chest": {
+    "muscles": [
+      {
+        "name": "Pecs",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The pectoralis major, or 'pecs', are large chest muscles that assist in arm movements."
+      },
+      {
+        "name": "Pectoralis Minor",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The pectoralis minor is a smaller muscle beneath the pectoralis major that helps stabilize the shoulder blade."
+      },
+      {
+        "name": "Serratus Anterior",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The serratus anterior muscle assists with the movement and stabilization of the shoulder blade."
+      }
+    ],
+    "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+  },
+  "Arms": {
+    "Biceps": {
+      "muscles": [
+        {
+          "name": "Biceps Brachii",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The biceps brachii is the prominent muscle on the front of the upper arm responsible for flexing the elbow."
+        },
+        {
+          "name": "Brachialis",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The brachialis muscle lies underneath the biceps and assists in elbow flexion."
+        },
+        {
+          "name": "Brachioradialis",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The brachioradialis is a muscle of the forearm that helps with elbow flexion and forearm rotation."
+        }
+      ],
+      "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+    },
+    "Triceps": {
+      "muscles": [
+        {
+          "name": "Triceps Brachii",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The triceps brachii is the muscle at the back of the upper arm responsible for extending the elbow."
+        },
+        {
+          "name": "Anconeus",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The anconeus is a small muscle that assists with elbow extension."
+        }
+      ],
+      "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+    }
+  },
+  "Legs": {
+    "Quadriceps": {
+      "muscles": [
+        {
+          "name": "Quads",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The quadriceps are a group of four muscles on the front of the thigh responsible for extending the knee."
+        },
+        {
+          "name": "Vastus Lateralis",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The vastus lateralis is the outermost muscle of the quadriceps group."
+        },
+        {
+          "name": "Vastus Medialis",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The vastus medialis is the innermost muscle of the quadriceps group."
+        },
+        {
+          "name": "Vastus Intermedius",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The vastus intermedius is located between the vastus lateralis and medialis muscles."
+        },
+        {
+          "name": "Rectus Femoris",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The rectus femoris is a central muscle of the quadriceps that assists with knee extension."
+        }
+      ],
+      "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+    },
+    "Hamstrings": {
+      "muscles": [
+        {
+          "name": "Semitendinosus",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The semitendinosus is one of the three hamstring muscles located on the back of the thigh."
+        },
+        {
+          "name": "Semimembranosus",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The semimembranosus is a hamstring muscle that assists with knee flexion and hip extension."
+        },
+        {
+          "name": "Biceps Femoris",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The biceps femoris is a hamstring muscle responsible for knee flexion and hip extension."
+        }
+      ],
+      "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+    },
+    "Calves": {
+      "muscles": [
+        {
+          "name": "Gastrocnemius",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The gastrocnemius is the large calf muscle that helps with plantarflexion of the foot."
+        },
+        {
+          "name": "Soleus",
+          "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+          "description": "The soleus is a deep calf muscle that assists with plantarflexion of the foot."
+        }
+      ],
+      "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+    }
+  },
+  "Shoulders": {
+    "muscles": [
+      {
+        "name": "Delts",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The deltoids, or 'delts', are the rounded shoulder muscles responsible for arm abduction."
+      },
+      {
+        "name": "Supraspinatus",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The supraspinatus is a rotator cuff muscle that aids in shoulder abduction."
+      },
+      {
+        "name": "Infraspinatus",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The infraspinatus is a rotator cuff muscle that helps with shoulder external rotation."
+      },
+      {
+        "name": "Teres Minor",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The teres minor is a rotator cuff muscle that assists with shoulder external rotation."
+      },
+      {
+        "name": "Subscapularis",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The subscapularis is a rotator cuff muscle that aids in shoulder internal rotation."
+      }
+    ],
+    "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+  },
+  "Core": {
+    "muscles": [
+      {
+        "name": "Abs",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The abs, or rectus abdominis, are the front abdominal muscles responsible for flexing the spine."
+      },
+      {
+        "name": "Obliques",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The obliques are muscles on the side of the abdomen that help with torso rotation and lateral flexion."
+      },
+      {
+        "name": "Transverse Abdominis",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The transverse abdominis is the deep abdominal muscle that stabilizes the core."
+      },
+      {
+        "name": "Lower Back",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The lower back includes the erector spinae muscles that support and extend the spine."
+      },
+      {
+        "name": "Psoas",
+        "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png",
+        "description": "The psoas is a deep muscle that helps with hip flexion and stabilizing the lower spine."
+      }
+    ],
+    "imageUrl": "https://foremanbrosinc.com/wp-content/uploads/2017/05/1c0d0f0cb8b7f2fb2685da9798efe42b_big-image-png-image-placeholder-clipart_2400-2400.png"
+  }
+}
