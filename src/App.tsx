@@ -1,17 +1,19 @@
 // src/App.tsx
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import EquipmentForm from './components/EquipmentForm';
-import EquipmentList from './components/EquipmentList';
-import ExerciseForm from './components/ExerciseForm';
-import ExerciseList from './components/ExerciseList';
-import WorkoutForm from './components/WorkoutForm';
-import WorkoutList from './components/WorkoutList';
-import { theme } from './styles/theme';
-import styled from 'styled-components';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import EquipmentForm from "./components/EquipmentForm";
+import EquipmentList from "./components/EquipmentList";
+import ExerciseForm from "./components/ExerciseForm";
+import ExerciseList from "./components/ExerciseList";
+import WorkoutForm from "./components/WorkoutForm";
+import WorkoutList from "./components/WorkoutList";
+import MuscleGroupForm from "./components/MuscleGroupForm";
+import MuscleGroupList from "./components/MuscleGroupList";
+import { theme } from "./styles/theme";
+import styled from "styled-components";
 
 const AppContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
@@ -45,6 +47,9 @@ const App: React.FC = () => {
               <Route path="/exercises" element={<ExerciseList />} />
               <Route path="/add-exercise" element={<ExerciseForm />} />
               <Route path="/edit-exercise/:id" element={<ExerciseForm />} />
+              <Route path="/muscle-groups" element={<MuscleGroupList />} />
+              <Route path="/add-muscle-group" element={<MuscleGroupForm />} />
+              <Route path="/edit-muscle-group/:id" element={<MuscleGroupForm />} />
             </Routes>
           </ContentContainer>
           <Footer />
