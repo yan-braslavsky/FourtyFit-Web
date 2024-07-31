@@ -8,6 +8,8 @@ export const theme = {
     textLight: '#FFFFFF', // White for text on dark backgrounds
     card: '#FFF9F3', // Off-white
     accent: '#E6CBA8', // Light beige
+    warning: '#FFA500', // Orange for the update button
+    warningHover: '#FF8C00', // Darker orange for hover state
   },
 };
 

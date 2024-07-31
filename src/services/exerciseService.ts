@@ -1,5 +1,6 @@
 // src/services/exerciseService.ts
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+
 import { db } from '../firebase/config';
 
 export interface Exercise {
@@ -8,7 +9,10 @@ export interface Exercise {
   description: string;
   imageUrl: string;
   equipmentIds: string[];
+  muscleGroupIds: string[]; // This should be muscleGroupIds, not muscleGroups
 }
+
+
 
 export const getExercises = async (): Promise<Exercise[]> => {
   const exercisesCol = collection(db, 'exercises');
