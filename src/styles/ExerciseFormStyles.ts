@@ -1,6 +1,20 @@
 import styled from "styled-components";
 
+export const FormContainer = styled.form`
+  background-color: ${props => props.theme.colors.background};
+  padding: 2rem;
+  border-radius: 8px;
+  width: 50vw;
+  max-width: 1000px;
+  margin: 2rem auto;
+`;
 
+export const TopBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
 
 export const Button = styled.button`
   background-color: ${props => props.theme.colors.primary};
@@ -10,89 +24,65 @@ export const Button = styled.button`
   cursor: pointer;
   border-radius: 4px;
 `;
-export const MuscleList = styled.div`
-  flex: 1;
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 4px;
-  padding: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
-`;
 
-export const MuscleItem = styled.div<{ $selected: boolean }>`
-  padding: 0.5rem;
-  cursor: pointer;
-  background-color: ${props => props.$selected ? props.theme.colors.accent : 'transparent'};
-  &:hover {
-    background-color: ${props => props.theme.colors.hover};
-  }
-`;
-
-
-export const BackButton = styled(Button)`
+export const DiscardButton = styled(Button)`
   background-color: ${props => props.theme.colors.secondary};
 `;
 
-
-export const MuscleGroupImage = styled.img`
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  margin-right: 0.5rem;
+export const SaveButton = styled(Button)`
+  margin-left: 1rem;
 `;
 
-
-
-export const SelectedMuscleGroups = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-`;
-
-
-
-export const ErrorMessage = styled.div`
-  color: red;
+export const Input = styled.input`
+  width: 100%;
+  padding: 0.5rem;
   margin-bottom: 1rem;
 `;
 
+export const TextArea = styled.textarea`
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  min-height: 150px;
+`;
 
-
-export const MuscleGroupSelector = styled.div`
+export const Select = styled.select`
+  width: 100%;
+  padding: 0.5rem;
   margin-bottom: 1rem;
 `;
 
-export const MuscleGroupList = styled.div`
+export const ImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; // 16:9 aspect ratio
+  margin-bottom: 1rem;
+  background-color: ${props => props.theme.colors.background};
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 4px;
-  padding: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
+  overflow: hidden;
 `;
 
-export const MuscleGroupItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+export const ImagePreview = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+export const EditImageButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 50%;
   padding: 0.5rem;
-  &:hover {
-    background-color: ${props => props.theme.colors.hover};
-  }
+  cursor: pointer;
+  z-index: 1;
 `;
-
-
-
-export const MuscleGroupBadge = styled.div`
-  background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.text};
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-`;
-
-
 
 export const SelectorContainer = styled.div`
   display: flex;
@@ -159,70 +149,7 @@ export const RemoveBadgeButton = styled.button`
   cursor: pointer;
 `;
 
-
-export const FormContainer = styled.form`
-  background-color: ${props => props.theme.colors.background};
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 800px;
-  margin: 2rem auto;
-`;
-
-export const TopBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+export const ErrorMessage = styled.div`
+  color: red;
   margin-bottom: 1rem;
-`;
-
-
-
-export const DiscardButton = styled(Button)`
-  background-color: ${props => props.theme.colors.secondary};
-`;
-
-export const SaveButton = styled(Button)`
-  margin-left: 1rem;
-`;
-
-export const Input = styled.input`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-export const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  min-height: 150px;
-`;
-
-export const Select = styled.select`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-export const ImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  margin-bottom: 1rem;
-`;
-
-export const ImagePreview = styled.img`
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
-`;
-
-export const EditImageButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(255, 255, 255, 0.7);
-  border: none;
-  border-radius: 50%;
-  padding: 0.5rem;
-  cursor: pointer;
 `;

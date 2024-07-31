@@ -3,7 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useExerciseFormViewModel } from "../viewmodels/ ExerciseFormViewModel";
 import ImageCropper from "./ImageCropper";
 import { FaArrowLeft, FaPlus, FaTimes, FaEdit } from "react-icons/fa";
+import styled from "styled-components";
 import * as S from "../styles/ExerciseFormStyles";
+
+const CropperWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;
 
 const ExerciseForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -38,7 +47,7 @@ const ExerciseForm: React.FC = () => {
   };
 
   const handleImageEdit = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     fileInputRef.current?.click();
   };
 
@@ -68,11 +77,13 @@ const ExerciseForm: React.FC = () => {
 
       <S.ImageContainer>
         {isEditingImage && imageFile ? (
-          <ImageCropper
-            imageFile={imageFile}
-            onCrop={() => {}}
-            ref={cropperRef}
-          />
+          <CropperWrapper>
+            <ImageCropper
+              imageFile={imageFile}
+              onCrop={() => {}}
+              ref={cropperRef}
+            />
+          </CropperWrapper>
         ) : (
           <>
             <S.ImagePreview src={exercise.imageUrl || '/placeholder-image.jpg'} alt={exercise.name} />
