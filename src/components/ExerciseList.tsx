@@ -139,26 +139,6 @@ const AddExerciseButton = styled(Link)`
   }
 `;
 
-const UpdateButton = styled.button`
-  background-color: ${props => props.theme.colors.warning};
-  color: ${props => props.theme.colors.text};
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-
-  &:hover {
-    background-color: ${props => props.theme.colors.warningHover};
-  }
-
-  svg {
-    margin-right: 0.5rem;
-  }
-`;
-
 const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 1rem;
