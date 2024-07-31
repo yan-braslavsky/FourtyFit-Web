@@ -49,6 +49,8 @@ const App: React.FC = () => {
               <Route path="/muscle-groups" element={<MuscleGroupList />} />
               <Route path="/add-muscle-group" element={<MuscleGroupForm />} />
               <Route path="/edit-muscle-group/:id" element={<MuscleGroupForm />} />
+              {/* Catch-all route for unknown paths */}
+              <Route path="*" element={<Navigate replace to="/workouts" />} />
             </Routes>
           </ContentContainer>
           <Footer />
