@@ -13,12 +13,10 @@ export const useExerciseFormViewModel = (id?: string) => {
     description: "",
     imageUrl: "",
     equipmentIds: [],
-    muscleGroupIds: [], // Changed from muscleGroups to muscleGroupIds
+    muscleGroupIds: [],
   });
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
-  const [selectedMuscleGroups, setSelectedMuscleGroups] = useState<MuscleGroup[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -35,9 +33,6 @@ export const useExerciseFormViewModel = (id?: string) => {
         if (id) {
           const fetchedExercise = await getExercise(id);
           setExercise(fetchedExercise);
-          setSelectedMuscleGroups(
-            fetchedMuscleGroups.filter((mg) => fetchedExercise.muscleGroupIds?.includes(mg.id!))
-          );
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -58,28 +53,11 @@ export const useExerciseFormViewModel = (id?: string) => {
   };
 
   const toggleMuscleGroup = (muscleGroupId: string) => {
-    setExpandedGroups((prev) =>
-      prev.includes(muscleGroupId)
-        ? prev.filter((id) => id !== muscleGroupId)
-        : [...prev, muscleGroupId]
-    );
-  };
-
-  const selectMuscleGroup = (muscleGroup: MuscleGroup) => {
-    if (!selectedMuscleGroups.find((mg) => mg.id === muscleGroup.id)) {
-      setSelectedMuscleGroups([...selectedMuscleGroups, muscleGroup]);
-      setExercise({
-        ...exercise,
-        muscleGroupIds: [...(exercise.muscleGroupIds || []), muscleGroup.id!],
-      });
-    }
-  };
-
-  const removeMuscleGroup = (muscleGroupId: string) => {
-    setSelectedMuscleGroups(selectedMuscleGroups.filter((mg) => mg.id !== muscleGroupId));
-    setExercise({
-      ...exercise,
-      muscleGroupIds: exercise.muscleGroupIds?.filter((id) => id !== muscleGroupId) || [],
+    setExercise(prev => {
+      const newMuscleGroupIds = prev.muscleGroupIds.includes(muscleGroupId)
+        ? prev.muscleGroupIds.filter(id => id !== muscleGroupId)
+        : [...prev.muscleGroupIds, muscleGroupId];
+      return { ...prev, muscleGroupIds: newMuscleGroupIds };
     });
   };
 
@@ -114,16 +92,12 @@ export const useExerciseFormViewModel = (id?: string) => {
     exercise,
     equipment,
     muscleGroups,
-    expandedGroups,
-    selectedMuscleGroups,
     error,
     imageFile,
     setImageFile,
     handleInputChange,
     handleEquipmentChange,
     toggleMuscleGroup,
-    selectMuscleGroup,
-    removeMuscleGroup,
     handleSubmit,
   };
 };

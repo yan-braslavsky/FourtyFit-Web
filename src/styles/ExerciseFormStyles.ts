@@ -1,5 +1,24 @@
 import styled from "styled-components";
 
+
+export const MuscleList = styled.div`
+  flex: 1;
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: 4px;
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+`;
+
+export const MuscleItem = styled.div<{ $selected: boolean }>`
+  padding: 0.5rem;
+  cursor: pointer;
+  background-color: ${props => props.$selected ? props.theme.colors.accent : 'transparent'};
+  &:hover {
+    background-color: ${props => props.theme.colors.hover};
+  }
+`;
+
 export const FormContainer = styled.form`
   background-color: ${props => props.theme.colors.background};
   padding: 2rem;
@@ -40,17 +59,6 @@ export const BackButton = styled(Button)`
   background-color: ${props => props.theme.colors.secondary};
 `;
 
-export const MuscleGroupSelector = styled.div`
-  margin-bottom: 1rem;
-`;
-
-export const MuscleGroupItem = styled.div<{ $selected: boolean }>`
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  cursor: pointer;
-  background-color: ${(props) => (props.$selected ? props.theme.colors.accent : "transparent")};
-`;
 
 export const MuscleGroupImage = styled.img`
   width: 30px;
@@ -59,15 +67,7 @@ export const MuscleGroupImage = styled.img`
   margin-right: 0.5rem;
 `;
 
-export const MuscleList = styled.div`
-  margin-left: 1rem;
-`;
 
-export const MuscleItem = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-`;
 
 export const SelectedMuscleGroups = styled.div`
   display: flex;
@@ -75,6 +75,51 @@ export const SelectedMuscleGroups = styled.div`
   gap: 0.5rem;
   margin-top: 1rem;
 `;
+
+
+
+export const ErrorMessage = styled.div`
+  color: red;
+  margin-bottom: 1rem;
+`;
+
+export const ImagePreview = styled.img`
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 1rem;
+`;
+
+export const MuscleGroupSelector = styled.div`
+  margin-bottom: 1rem;
+`;
+
+export const MuscleGroupList = styled.div`
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: 4px;
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+`;
+
+export const MuscleGroupItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  &:hover {
+    background-color: ${props => props.theme.colors.hover};
+  }
+`;
+
+export const AddButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${props => props.theme.colors.primary};
+  font-size: 1.2rem;
+`;
+
 
 export const MuscleGroupBadge = styled.div`
   background-color: ${props => props.theme.colors.primary};
@@ -91,16 +136,4 @@ export const RemoveBadgeButton = styled.button`
   color: ${props => props.theme.colors.text};
   margin-left: 0.5rem;
   cursor: pointer;
-`;
-
-export const ErrorMessage = styled.div`
-  color: red;
-  margin-bottom: 1rem;
-`;
-
-export const ImagePreview = styled.img`
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-  margin-bottom: 1rem;
 `;

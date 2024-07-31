@@ -1,27 +1,23 @@
 import React, { useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {useExerciseFormViewModel} from "../viewmodels/ ExerciseFormViewModel";
+import { useExerciseFormViewModel } from "../viewmodels/ ExerciseFormViewModel";
 import ImageCropper from "./ImageCropper";
-import { FaArrowLeft, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaTimes } from "react-icons/fa";
 import * as S from "../styles/ExerciseFormStyles";
 
-export const ExerciseForm: React.FC = () => {
+const ExerciseForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const {
     exercise,
     equipment,
     muscleGroups,
-    expandedGroups,
-    selectedMuscleGroups,
     error,
     imageFile,
     setImageFile,
     handleInputChange,
     handleEquipmentChange,
     toggleMuscleGroup,
-    selectMuscleGroup,
-    removeMuscleGroup,
     handleSubmit,
   } = useExerciseFormViewModel(id);
 
@@ -38,6 +34,9 @@ export const ExerciseForm: React.FC = () => {
   const handleBack = () => {
     navigate("/exercises");
   };
+
+  const selectedMuscleGroups = muscleGroups.filter(mg => exercise.muscleGroupIds.includes(mg.id!));
+  const unselectedMuscleGroups = muscleGroups.filter(mg => !exercise.muscleGroupIds.includes(mg.id!));
 
   return (
     <S.FormContainer onSubmit={onSubmit}>
@@ -75,42 +74,23 @@ export const ExerciseForm: React.FC = () => {
       </S.Select>
       <S.MuscleGroupSelector>
         <h3>Select Muscle Groups</h3>
-        {muscleGroups.map((muscleGroup) => (
-          <div key={muscleGroup.id}>
-            <S.MuscleGroupItem
-              onClick={() => toggleMuscleGroup(muscleGroup.id!)}
-              $selected={selectedMuscleGroups.some((mg) => mg.id === muscleGroup.id)}
-            >
-              {expandedGroups.includes(muscleGroup.id!) ? (
-                <FaChevronDown />
-              ) : (
-                <FaChevronRight />
-              )}
-              <S.MuscleGroupImage src={muscleGroup.imageUrl} alt={muscleGroup.name} />
+        <S.MuscleGroupList>
+          {unselectedMuscleGroups.map((muscleGroup) => (
+            <S.MuscleGroupItem key={muscleGroup.id}>
               {muscleGroup.name}
+              <S.AddButton onClick={() => toggleMuscleGroup(muscleGroup.id!)}>
+                <FaPlus />
+              </S.AddButton>
             </S.MuscleGroupItem>
-            {expandedGroups.includes(muscleGroup.id!) && (
-              <S.MuscleList>
-                {muscleGroup.muscles.map((muscle) => (
-                  <S.MuscleItem
-                    key={muscle.name}
-                    onClick={() => selectMuscleGroup(muscleGroup)}
-                  >
-                    <S.MuscleGroupImage src={muscle.imageUrl} alt={muscle.name} />
-                    {muscle.name}
-                  </S.MuscleItem>
-                ))}
-              </S.MuscleList>
-            )}
-          </div>
-        ))}
+          ))}
+        </S.MuscleGroupList>
       </S.MuscleGroupSelector>
       <S.SelectedMuscleGroups>
         {selectedMuscleGroups.map((muscleGroup) => (
           <S.MuscleGroupBadge key={muscleGroup.id}>
             {muscleGroup.name}
-            <S.RemoveBadgeButton onClick={() => removeMuscleGroup(muscleGroup.id!)}>
-              &times;
+            <S.RemoveBadgeButton onClick={() => toggleMuscleGroup(muscleGroup.id!)}>
+              <FaTimes />
             </S.RemoveBadgeButton>
           </S.MuscleGroupBadge>
         ))}

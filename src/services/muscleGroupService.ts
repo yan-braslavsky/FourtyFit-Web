@@ -3,6 +3,7 @@ import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 export interface Muscle {
+  id: string;
   name: string;
   imageUrl: string;
   description: string;
@@ -12,7 +13,7 @@ export interface MuscleGroup {
   id?: string;
   name: string;
   muscles: Muscle[];
-  imageUrl: string; 
+  imageUrl: string;
 }
 
 export const getMuscleGroups = async (): Promise<MuscleGroup[]> => {
