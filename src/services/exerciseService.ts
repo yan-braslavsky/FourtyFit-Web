@@ -1,6 +1,4 @@
-// src/services/exerciseService.ts
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
-
+import { collection, getDocs, doc, getDoc, setDoc, updateDoc, query, where, limit } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 export interface Exercise {
@@ -9,10 +7,8 @@ export interface Exercise {
   description: string;
   imageUrl: string;
   equipmentIds: string[];
-  muscleGroupIds: string[]; // This should be muscleGroupIds, not muscleGroups
+  muscleGroupIds: string[];
 }
-
-
 
 export const getExercises = async (): Promise<Exercise[]> => {
   const exercisesCol = collection(db, 'exercises');
@@ -30,49 +26,31 @@ export const getExercise = async (id: string): Promise<Exercise> => {
 };
 
 export const saveExercise = async (exercise: Exercise): Promise<Exercise> => {
-  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/addExercise', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(exercise),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to save exercise');
-  }
-
-  const result = await response.json();
-  return { ...exercise, id: result.id };
+  const newExerciseRef = doc(collection(db, 'exercises'));
+  const newExercise = { ...exercise, id: newExerciseRef.id };
+  await setDoc(newExerciseRef, newExercise);
+  console.log("Saved exercise:", newExercise);
+  return newExercise;
 };
 
-export const updateExercise = async (exercise: Exercise): Promise<void> => {
-  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/updateExercise', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(exercise),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to update exercise');
+export const updateExercise = async (exercise: Exercise): Promise<Exercise> => {
+  if (!exercise.id) {
+    throw new Error('Exercise ID is required for updating');
   }
+  const exerciseRef = doc(db, 'exercises', exercise.id);
+  const { id, ...updateData } = exercise;
+  await updateDoc(exerciseRef, updateData);
+  console.log("Updated exercise:", exercise);
+  return exercise;
 };
 
 export const deleteExercise = async (id: string): Promise<void> => {
-  const response = await fetch('https://us-central1-fourtyfit-44a5b.cloudfunctions.net/removeExercise', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ id }),
-  });
+  await setDoc(doc(db, 'exercises', id), { deleted: true }, { merge: true });
+};
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to delete exercise');
-  }
+export const checkExerciseExists = async (name: string): Promise<boolean> => {
+  const exercisesCol = collection(db, 'exercises');
+  const q = query(exercisesCol, where('name', '==', name), limit(1));
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, MutableRefObject } from "react";
 import { Exercise } from "../services/exerciseService";
 import { Equipment } from "../services/equipmentService";
 import { MuscleGroup } from "../services/muscleGroupService";
@@ -7,7 +7,7 @@ import { getEquipment } from "../services/equipmentService";
 import { getMuscleGroups } from "../services/muscleGroupService";
 import { uploadImage } from "../services/storageService";
 
-export const useExerciseFormViewModel = (id?: string) => {
+export const useExerciseFormViewModel = (id?: string, cropperRef?: MutableRefObject<any>) => {
   const [exercise, setExercise] = useState<Exercise>({
     name: "",
     description: "",
@@ -47,9 +47,13 @@ export const useExerciseFormViewModel = (id?: string) => {
     setExercise({ ...exercise, [name]: value });
   };
 
-  const handleEquipmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-    setExercise({ ...exercise, equipmentIds: selectedOptions });
+  const toggleEquipment = (equipmentId: string) => {
+    setExercise(prev => {
+      const newEquipmentIds = prev.equipmentIds.includes(equipmentId)
+        ? prev.equipmentIds.filter(id => id !== equipmentId)
+        : [...prev.equipmentIds, equipmentId];
+      return { ...prev, equipmentIds: newEquipmentIds };
+    });
   };
 
   const toggleMuscleGroup = (muscleGroupId: string) => {
@@ -68,11 +72,15 @@ export const useExerciseFormViewModel = (id?: string) => {
     try {
       let imageUrl = exercise.imageUrl;
 
-      if (imageFile) {
-        imageUrl = await uploadImage(imageFile, `exercises/${Date.now()}.png`);
+      if (imageFile && cropperRef?.current) {
+        const croppedImageBlob = await cropperRef.current.cropImage();
+        imageUrl = await uploadImage(croppedImageBlob, `exercises/${Date.now()}.png`);
       }
 
-      const exerciseData = { ...exercise, imageUrl };
+      const exerciseData: Exercise = {
+        ...exercise,
+        imageUrl,
+      };
 
       if (id) {
         await updateExercise(exerciseData);
@@ -96,7 +104,7 @@ export const useExerciseFormViewModel = (id?: string) => {
     imageFile,
     setImageFile,
     handleInputChange,
-    handleEquipmentChange,
+    toggleEquipment,
     toggleMuscleGroup,
     handleSubmit,
   };
