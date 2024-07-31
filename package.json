@@ -21,6 +21,7 @@
     "react-scripts": "5.0.1",
     "styled-components": "^6.1.12",
     "typescript": "^4.9.5",
+    "uuid": "^10.0.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -51,6 +52,7 @@
   },
   "devDependencies": {
     "@types/react-easy-crop": "^1.16.0",
+    "@types/uuid": "^10.0.0",
     "gh-pages": "^6.1.1"
   }
 }

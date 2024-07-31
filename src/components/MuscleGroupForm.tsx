@@ -7,6 +7,7 @@ import { uploadImage } from "../services/storageService";
 import ImageCropper, { ImageCropperRef } from "./ImageCropper";
 import LoadingOverlay from "./LoadingOverlay";
 import { FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
+import { v4 as uuidv4 } from 'uuid';
 
 const FormContainer = styled.form`
   background-color: ${props => props.theme.colors.background};
@@ -114,7 +115,7 @@ const MuscleGroupForm: React.FC = () => {
   const handleAddMuscle = () => {
     setMuscleGroup({
       ...muscleGroup,
-      muscles: [...muscleGroup.muscles, { name: "", imageUrl: "", description: "" }],
+      muscles: [...muscleGroup.muscles, { id: uuidv4(), name: "", imageUrl: "", description: "" }],
     });
   };
 
@@ -229,7 +230,7 @@ const MuscleGroupForm: React.FC = () => {
       )}
       <h3>Muscles</h3>
       {muscleGroup.muscles.map((muscle, index) => (
-        <MuscleContainer key={index}>
+        <MuscleContainer key={muscle.id}>
           <Input
             type="text"
             value={muscle.name}

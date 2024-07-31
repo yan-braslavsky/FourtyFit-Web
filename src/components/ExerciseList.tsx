@@ -1,11 +1,12 @@
 // src/components/ExerciseList.tsx
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';
-import { getExercises, deleteExercise, Exercise } from '../services/exerciseService';
-import { getEquipment, Equipment } from '../services/equipmentService';
-import LoadingOverlay from './LoadingOverlay';
-import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Link, useNavigate } from "react-router-dom";
+import { getExercises, deleteExercise, Exercise } from "../services/exerciseService";
+import { getEquipment, Equipment } from "../services/equipmentService";
+import { getMuscleGroups, MuscleGroup } from "../services/muscleGroupService";
+import LoadingOverlay from "./LoadingOverlay";
+import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 
 const ExerciseListContainer = styled.div`
   background-color: ${props => props.theme.colors.background};
@@ -97,6 +98,17 @@ const EquipmentItem = styled.li`
   font-size: 0.8rem;
 `;
 
+const MuscleGroupBadge = styled.span`
+  background-color: ${props => props.theme.colors.secondary};
+  color: ${props => props.theme.colors.text};
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+`;
+
 const ButtonGroup = styled.div`
   display: flex;
   gap: 0.5rem;
@@ -127,6 +139,26 @@ const AddExerciseButton = styled(Link)`
   }
 `;
 
+const UpdateButton = styled.button`
+  background-color: ${props => props.theme.colors.warning};
+  color: ${props => props.theme.colors.text};
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+
+  &:hover {
+    background-color: ${props => props.theme.colors.warningHover};
+  }
+
+  svg {
+    margin-right: 0.5rem;
+  }
+`;
+
 const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 1rem;
@@ -135,42 +167,45 @@ const ErrorMessage = styled.div`
 const ExerciseList: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchExercisesAndEquipment();
+    fetchExercisesAndData();
   }, []);
 
-  const fetchExercisesAndEquipment = async () => {
+  const fetchExercisesAndData = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [fetchedExercises, fetchedEquipment] = await Promise.all([
+      const [fetchedExercises, fetchedEquipment, fetchedMuscleGroups] = await Promise.all([
         getExercises(),
-        getEquipment()
+        getEquipment(),
+        getMuscleGroups(),
       ]);
       setExercises(fetchedExercises);
       setEquipment(fetchedEquipment);
+      setMuscleGroups(fetchedMuscleGroups);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Failed to load exercises and equipment. Please try again.');
+      console.error("Error fetching data:", err);
+      setError("Failed to load exercises and data. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this exercise?')) {
+    if (window.confirm("Are you sure you want to delete this exercise?")) {
       setIsLoading(true);
       try {
         await deleteExercise(id);
         setExercises(exercises.filter(exercise => exercise.id !== id));
       } catch (err) {
-        console.error('Error deleting exercise:', err);
-        setError('Failed to delete exercise. Please try again.');
+        console.error("Error deleting exercise:", err);
+        setError("Failed to delete exercise. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -181,10 +216,17 @@ const ExerciseList: React.FC = () => {
     navigate(`/edit-exercise/${id}`);
   };
 
-  const getEquipmentNames = (equipmentIds: string[]): string[] => {
+  const getEquipmentNames = (equipmentIds: string[] = []): string[] => {
     return equipmentIds.map(id => {
       const eq = equipment.find(e => e.id === id);
-      return eq ? eq.name : 'Unknown Equipment';
+      return eq ? eq.name : "Unknown Equipment";
+    });
+  };
+
+  const getMuscleGroupNames = (muscleGroupIds: string[] = []): string[] => {
+    return muscleGroupIds.map(id => {
+      const mg = muscleGroups.find(m => m.id === id);
+      return mg ? mg.name : "Unknown Muscle Group";
     });
   };
 
@@ -193,8 +235,12 @@ const ExerciseList: React.FC = () => {
     exercise.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     getEquipmentNames(exercise.equipmentIds).some(name => 
       name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) ||
+    getMuscleGroupNames(exercise.muscleGroupIds).some(name =>
+      name.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
 
   if (isLoading) {
     return <LoadingOverlay />;
@@ -212,7 +258,9 @@ const ExerciseList: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </SearchBar>
-        <AddExerciseButton to="/add-exercise">Add New Exercise</AddExerciseButton>
+        <div>
+          <AddExerciseButton to="/add-exercise">Add New Exercise</AddExerciseButton>
+        </div>
       </TopBar>
       
       <h2>Exercises</h2>
@@ -229,6 +277,11 @@ const ExerciseList: React.FC = () => {
                   <EquipmentItem key={index}>{name}</EquipmentItem>
                 ))}
               </EquipmentList>
+              <div>
+                {exercise.muscleGroupIds && getMuscleGroupNames(exercise.muscleGroupIds).map((name, index) => (
+                  <MuscleGroupBadge key={index}>{name}</MuscleGroupBadge>
+                ))}
+              </div>
             </ExerciseDetails>
             <ButtonGroup>
               <IconButton onClick={() => exercise.id && handleEdit(exercise.id)}>

@@ -1,160 +1,110 @@
-// src/components/ExerciseForm.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import { useParams, useNavigate } from 'react-router-dom';
-import { saveExercise, updateExercise, getExercise, Exercise } from '../services/exerciseService';
-import { getEquipment, Equipment } from '../services/equipmentService';
-import { uploadImage } from '../services/storageService';
-import ImageCropper from './ImageCropper';
-import { FaArrowLeft } from 'react-icons/fa';
+import React, { useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useExerciseFormViewModel } from "../viewmodels/ ExerciseFormViewModel";
+import ImageCropper from "./ImageCropper";
+import { FaArrowLeft, FaPlus, FaTimes, FaEdit } from "react-icons/fa";
+import styled from "styled-components";
+import * as S from "../styles/ExerciseFormStyles";
 
-const FormContainer = styled.form`
-  background-color: ${props => props.theme.colors.background};
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 500px;
-  margin: 2rem auto;
-`;
-
-const Input = styled.input`
+const CropperWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const Button = styled.button`
-  background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.text};
-  border: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  margin-right: 1rem;
-`;
-
-const BackButton = styled(Button)`
-  background-color: ${props => props.theme.colors.secondary};
-`;
-
-const ErrorMessage = styled.div`
-  color: red;
-  margin-bottom: 1rem;
-`;
-
-const ImagePreview = styled.img`
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-  margin-bottom: 1rem;
+  height: 100%;
 `;
 
 const ExerciseForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const [exercise, setExercise] = useState<Exercise>({
-    name: '',
-    description: '',
-    imageUrl: '',
-    equipmentIds: [],
-  });
-  const [equipment, setEquipment] = useState<Equipment[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isEditingImage, setIsEditingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<any>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedEquipment = await getEquipment();
-        setEquipment(fetchedEquipment);
+  const {
+    exercise,
+    equipment,
+    muscleGroups,
+    error,
+    imageFile,
+    setImageFile,
+    handleInputChange,
+    toggleEquipment,
+    toggleMuscleGroup,
+    handleSubmit,
+  } = useExerciseFormViewModel(id, cropperRef);
 
-        if (id) {
-          const fetchedExercise = await getExercise(id);
-          setExercise(fetchedExercise);
-        }
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load data. Please try again.');
-      }
-    };
-    fetchData();
-  }, [id]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setExercise({ ...exercise, [name]: value });
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await handleSubmit(e);
+    if (success) {
+      navigate("/exercises");
+    }
   };
 
-  const handleEquipmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setExercise({ ...exercise, equipmentIds: selectedOptions });
+  const handleDiscard = () => {
+    navigate("/exercises");
+  };
+
+  const handleImageEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    fileInputRef.current?.click();
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
+      setIsEditingImage(true);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const selectedMuscleGroups = muscleGroups.filter(mg => exercise.muscleGroupIds.includes(mg.id!));
+  const unselectedMuscleGroups = muscleGroups.filter(mg => !exercise.muscleGroupIds.includes(mg.id!));
 
-    try {
-      let imageUrl = exercise.imageUrl;
-
-      if (imageFile && cropperRef.current) {
-        const croppedImageBlob = await cropperRef.current.cropImage();
-        imageUrl = await uploadImage(croppedImageBlob, `exercises/${Date.now()}.png`);
-      }
-
-      const exerciseData = { ...exercise, imageUrl };
-
-      if (id) {
-        // Update existing exercise
-        setExercise(exerciseData);
-        updateExercise(exerciseData).catch(error => {
-          console.error('Error updating exercise:', error);
-          setError('Failed to update exercise. Please try again.');
-          setExercise(exercise);
-        });
-      } else {
-        // Create new exercise
-        const newExercise = await saveExercise(exerciseData);
-        setExercise(newExercise);
-      }
-
-      navigate('/exercises');
-    } catch (error) {
-      console.error('Error saving exercise:', error);
-      setError('Failed to save exercise. Please try again.');
-    }
-  };
-
-  const handleBack = () => {
-    navigate('/exercises');
-  };
+  const selectedEquipment = equipment.filter(eq => exercise.equipmentIds.includes(eq.id!));
+  const unselectedEquipment = equipment.filter(eq => !exercise.equipmentIds.includes(eq.id!));
 
   return (
-    <FormContainer onSubmit={handleSubmit}>
-      <BackButton type="button" onClick={handleBack}>
-        <FaArrowLeft /> Back to List
-      </BackButton>
-      <h2>{id ? 'Edit Exercise' : 'Create Exercise'}</h2>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-      <Input
+    <S.FormContainer onSubmit={onSubmit}>
+      <S.TopBar>
+        <S.DiscardButton type="button" onClick={handleDiscard}>
+          <FaArrowLeft /> Discard
+        </S.DiscardButton>
+        <S.SaveButton type="submit">Save Exercise</S.SaveButton>
+      </S.TopBar>
+
+      <h2>{id ? "Edit Exercise" : "Create Exercise"}</h2>
+
+      <S.ImageContainer>
+        {isEditingImage && imageFile ? (
+          <CropperWrapper>
+            <ImageCropper
+              imageFile={imageFile}
+              onCrop={() => {}}
+              ref={cropperRef}
+            />
+          </CropperWrapper>
+        ) : (
+          <>
+            <S.ImagePreview src={exercise.imageUrl || '/placeholder-image.jpg'} alt={exercise.name} />
+            <S.EditImageButton onClick={handleImageEdit} type="button">
+              <FaEdit />
+            </S.EditImageButton>
+          </>
+        )}
+      </S.ImageContainer>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
+
+      {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+      
+      <S.Input
         type="text"
         name="name"
         placeholder="Exercise Name"
@@ -162,43 +112,69 @@ const ExerciseForm: React.FC = () => {
         onChange={handleInputChange}
         required
       />
-      <TextArea
+
+      <S.TextArea
         name="description"
         placeholder="Description"
         value={exercise.description}
         onChange={handleInputChange}
         required
       />
-      <Select
-        multiple
-        name="equipmentIds"
-        value={exercise.equipmentIds}
-        onChange={handleEquipmentChange}
-      >
-        {equipment.map(item => (
-          <option key={item.id} value={item.id}>
-            {item.name}
-          </option>
-        ))}
-      </Select>
-      {exercise.imageUrl && (
-        <ImagePreview src={exercise.imageUrl} alt="Current exercise image" />
-      )}
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        ref={fileInputRef}
-      />
-      {imageFile && (
-        <ImageCropper
-          imageFile={imageFile}
-          onCrop={() => {}}
-          ref={cropperRef}
-        />
-      )}
-      <Button type="submit">Save Exercise</Button>
-    </FormContainer>
+
+      <S.SelectorContainer>
+        <S.SelectorColumn>
+          <h3>Select Equipment</h3>
+          <S.SelectorList>
+            {unselectedEquipment.map((item) => (
+              <S.SelectorItem key={item.id}>
+                {item.name}
+                <S.AddButton onClick={() => toggleEquipment(item.id!)}>
+                  <FaPlus />
+                </S.AddButton>
+              </S.SelectorItem>
+            ))}
+          </S.SelectorList>
+        </S.SelectorColumn>
+        <S.SelectorColumn>
+          <h3>Select Muscle Groups</h3>
+          <S.SelectorList>
+            {unselectedMuscleGroups.map((muscleGroup) => (
+              <S.SelectorItem key={muscleGroup.id}>
+                {muscleGroup.name}
+                <S.AddButton onClick={() => toggleMuscleGroup(muscleGroup.id!)}>
+                  <FaPlus />
+                </S.AddButton>
+              </S.SelectorItem>
+            ))}
+          </S.SelectorList>
+        </S.SelectorColumn>
+      </S.SelectorContainer>
+
+      <S.SelectedItemsContainer>
+        <S.SelectedItems>
+          <h4>Selected Equipment:</h4>
+          {selectedEquipment.map((item) => (
+            <S.SelectedItemBadge key={item.id}>
+              {item.name}
+              <S.RemoveBadgeButton onClick={() => toggleEquipment(item.id!)}>
+                <FaTimes />
+              </S.RemoveBadgeButton>
+            </S.SelectedItemBadge>
+          ))}
+        </S.SelectedItems>
+        <S.SelectedItems>
+          <h4>Selected Muscle Groups:</h4>
+          {selectedMuscleGroups.map((muscleGroup) => (
+            <S.SelectedItemBadge key={muscleGroup.id}>
+              {muscleGroup.name}
+              <S.RemoveBadgeButton onClick={() => toggleMuscleGroup(muscleGroup.id!)}>
+                <FaTimes />
+              </S.RemoveBadgeButton>
+            </S.SelectedItemBadge>
+          ))}
+        </S.SelectedItems>
+      </S.SelectedItemsContainer>
+    </S.FormContainer>
   );
 };
 
