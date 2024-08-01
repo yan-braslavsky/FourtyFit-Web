@@ -78,7 +78,7 @@ const WorkoutForm: React.FC = () => {
       <StyledSelect
         id="muscleGroups"
         options={muscleGroups.map(group => ({ value: group.id, label: group.name }))}
-        value={workout.muscleGroups?.map(id => ({ value: id, label: muscleGroups.find(g => g.id === id)?.name || id }))}
+        value={workout.muscleGroups.map((id: string) => ({ value: id, label: muscleGroups.find(g => g.id === id)?.name || id }))}
         onChange={(selected: MultiValue<OptionType>) => handleMuscleGroupChange(selected.map(option => option.value))}
         isMulti
       />
@@ -86,7 +86,7 @@ const WorkoutForm: React.FC = () => {
       <StyledSelect
         id="equipment"
         options={equipmentList.map(item => ({ value: item.id, label: item.name }))}
-        value={workout.equipment?.map(id => ({ value: id, label: equipmentList.find(e => e.id === id)?.name || id }))}
+        value={workout.equipment.map((id: string) => ({ value: id, label: equipmentList.find(e => e.id === id)?.name || id }))}
         onChange={(selected: MultiValue<OptionType>) => handleEquipmentChange(selected.map(option => option.value))}
         isMulti
       />

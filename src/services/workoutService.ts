@@ -1,12 +1,16 @@
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, query, where, limit } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, query, where,setDoc,deleteDoc,limit } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { Exercise } from "./exerciseService";
+import { MuscleGroup } from "./muscleGroupService";
+import { Equipment } from "./equipmentService";
+
 
 export interface Workout {
   id?: string;
   name: string;
-  imageUrl?: string;
-  muscleGroups?: string[];
-  equipment?: string[];
+  imageUrl: string;
+  muscleGroups: string[];
+  equipment: string[];
   exerciseGroups: ExerciseGroup[];
 }
 
@@ -21,10 +25,38 @@ export interface WorkoutExercise {
   weight: number;
 }
 
+export interface DetailedWorkout extends Workout {
+  muscleGroups: string[];
+  equipment: string[];
+}
+
 export const getWorkouts = async (): Promise<Workout[]> => {
-  const workoutsCol = collection(db, "workouts");
+  const workoutsCol = collection(db, 'workouts');
   const workoutSnapshot = await getDocs(workoutsCol);
-  return workoutSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Workout));
+  const workouts = workoutSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Workout));
+
+  const detailedWorkouts = await Promise.all(workouts.map(async (workout) => {
+    const muscleGroups = new Set<string>();
+    const equipment = new Set<string>();
+
+    for (const group of workout.exerciseGroups) {
+      for (const exercise of group.exercises) {
+        const exerciseDoc = await getDoc(doc(db, 'exercises', exercise.exerciseId));
+        const exerciseData = exerciseDoc.data() as Exercise;
+        
+        exerciseData.muscleGroupIds?.forEach(id => muscleGroups.add(id));
+        exerciseData.equipmentIds?.forEach(id => equipment.add(id));
+      }
+    }
+
+    return {
+      ...workout,
+      muscleGroups: Array.from(muscleGroups),
+      equipment: Array.from(equipment),
+    };
+  }));
+
+  return detailedWorkouts;
 };
 
 export const getWorkout = async (id: string): Promise<Workout> => {

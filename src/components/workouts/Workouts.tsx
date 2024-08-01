@@ -20,7 +20,7 @@ import WorkoutForm from "../workoutForm/WorkoutForm";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
 const Workouts: React.FC = () => {
-  const { workouts, loading, error, handleDelete } = useWorkoutsViewModel();
+  const { workouts, muscleGroups, equipmentList, loading, error, handleDelete } = useWorkoutsViewModel();
   const navigate = useNavigate();
 
   if (loading) {
@@ -52,17 +52,19 @@ const Workouts: React.FC = () => {
                   <BadgeSection>
                     <h4>Muscle Groups:</h4>
                     <BadgeContainer>
-                      {workout.muscleGroups && workout.muscleGroups.map(group => (
-                        <Badge key={group} color="primary">{group}</Badge>
-                      ))}
+                      {workout.muscleGroups.map(groupId => {
+                        const group = muscleGroups.find(mg => mg.id === groupId);
+                        return group && <Badge key={groupId} color="primary">{group.name}</Badge>;
+                      })}
                     </BadgeContainer>
                   </BadgeSection>
                   <BadgeSection>
                     <h4>Equipment:</h4>
                     <BadgeContainer>
-                      {workout.equipment && workout.equipment.map(item => (
-                        <Badge key={item} color="secondary">{item}</Badge>
-                      ))}
+                      {workout.equipment.map(equipId => {
+                        const equip = equipmentList.find(eq => eq.id === equipId);
+                        return equip && <Badge key={equipId} color="secondary">{equip.name}</Badge>;
+                      })}
                     </BadgeContainer>
                   </BadgeSection>
                   <ExerciseGroupInfo>Exercise groups: {workout.exerciseGroups.length}</ExerciseGroupInfo>

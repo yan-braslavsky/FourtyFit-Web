@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
-import { getWorkouts, deleteWorkout, Workout } from "../../services/workoutService";
+import { getWorkouts, deleteWorkout, DetailedWorkout } from "../../services/workoutService";
+import { getMuscleGroups, MuscleGroup } from "../../services/muscleGroupService";
+import { getEquipment, Equipment } from "../../services/equipmentService";
 
 export const useWorkoutsViewModel = () => {
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workouts, setWorkouts] = useState<DetailedWorkout[]>([]);
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
+  const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,8 +16,15 @@ export const useWorkoutsViewModel = () => {
 
   const fetchWorkouts = async () => {
     try {
-      const fetchedWorkouts = await getWorkouts();
+      setLoading(true);
+      const [fetchedWorkouts, fetchedMuscleGroups, fetchedEquipment] = await Promise.all([
+        getWorkouts(),
+        getMuscleGroups(),
+        getEquipment()
+      ]);
       setWorkouts(fetchedWorkouts);
+      setMuscleGroups(fetchedMuscleGroups);
+      setEquipmentList(fetchedEquipment);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching workouts:", err);
@@ -34,5 +45,5 @@ export const useWorkoutsViewModel = () => {
     }
   };
 
-  return { workouts, loading, error, handleDelete };
+  return { workouts, muscleGroups, equipmentList, loading, error, handleDelete };
 };
