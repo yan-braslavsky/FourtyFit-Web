@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Select, { Props } from "react-select";
 
 export const FormContainer = styled.form`
   background-color: ${props => props.theme.colors.background};
@@ -18,12 +19,6 @@ export const Label = styled.label`
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-`;
-
-export const Select = styled.select`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
 `;
 
 export const Button = styled.button`
@@ -63,4 +58,22 @@ export const GroupListItem = styled.li`
 export const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 1rem;
+`;
+
+export const StyledSelect = styled(Select).attrs({
+  classNamePrefix: "react-select"
+})<Props<any, boolean>>`
+  margin-bottom: 1rem;
+  
+  .react-select__control {
+    border-color: ${props => props.theme.colors.primary};
+  }
+
+  .react-select__option--is-selected {
+    background-color: ${props => props.theme.colors.primary};
+  }
+
+  .react-select__option--is-focused {
+    background-color: ${props => props.theme.colors.secondary};
+  }
 `;
