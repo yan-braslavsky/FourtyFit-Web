@@ -1,76 +1,20 @@
-// src/components/WorkoutForm.tsx
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getWorkout, saveWorkout, checkWorkoutExists, Workout, ExerciseGroup, WorkoutExercise } from '../services/workoutService';
-import { getExercises, Exercise } from '../services/exerciseService';
-import { FaArrowLeft, FaEdit, FaTrash } from 'react-icons/fa';
-
-const FormContainer = styled.form`
-  background-color: ${props => props.theme.colors.background};
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 2rem auto;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const Button = styled.button`
-  background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.text};
-  border: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-`;
-
-const BackButton = styled(Button)`
-  background-color: ${props => props.theme.colors.secondary};
-`;
-
-const ExerciseGroupContainer = styled.div`
-  border: 1px solid ${props => props.theme.colors.primary};
-  padding: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const GroupList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-`;
-
-const GroupListItem = styled.li`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  border: 1px solid ${props => props.theme.colors.primary};
-  margin-bottom: 0.5rem;
-`;
-
-const ErrorMessage = styled.div`
-  color: red;
-  margin-bottom: 1rem;
-`;
-
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getWorkout, saveWorkout, checkWorkoutExists, Workout, ExerciseGroup, WorkoutExercise } from "../../services/workoutService";
+import { getExercises, Exercise } from "../../services/exerciseService";
+import { FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FormContainer,
+  Input,
+  Label,
+  Select,
+  Button,
+  BackButton,
+  ExerciseGroupContainer,
+  GroupList,
+  GroupListItem,
+  ErrorMessage
+} from "./WorkoutStyles";
 
 enum FormStage {
   TITLE,
@@ -81,14 +25,14 @@ enum FormStage {
 const WorkoutForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const [workout, setWorkout] = useState<Workout>({ name: '', exerciseGroups: [] });
+  const [workout, setWorkout] = useState<Workout>({ name: "", exerciseGroups: [] });
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [currentGroup, setCurrentGroup] = useState<ExerciseGroup>({ exercises: [], sets: 1 });
   const [formStage, setFormStage] = useState<FormStage>(FormStage.TITLE);
-  const [titleError, setTitleError] = useState<string>('');
+  const [titleError, setTitleError] = useState<string>("");
   const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -100,8 +44,8 @@ const WorkoutForm: React.FC = () => {
           setWorkout(fetchedWorkout);
         }
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load data. Please try again.');
+        console.error("Error fetching data:", err);
+        setError("Failed to load data. Please try again.");
       }
     };
     fetchData();
@@ -110,16 +54,16 @@ const WorkoutForm: React.FC = () => {
   const handleTitleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setWorkout({ ...workout, name: newTitle });
-    
-    if (newTitle.trim() !== '') {
+
+    if (newTitle.trim() !== "") {
       const exists = await checkWorkoutExists(newTitle);
       if (exists && newTitle !== workout.name) {
-        setTitleError('A workout with this title already exists');
+        setTitleError("A workout with this title already exists");
       } else {
-        setTitleError('');
+        setTitleError("");
       }
     } else {
-      setTitleError('');
+      setTitleError("");
     }
   };
 
@@ -128,7 +72,7 @@ const WorkoutForm: React.FC = () => {
       ...prevGroup,
       exercises: [
         ...prevGroup.exercises,
-        { exerciseId: '', reps: 0, weight: 0 }
+        { exerciseId: "", reps: 0, weight: 0 }
       ]
     }));
   };
@@ -180,15 +124,15 @@ const WorkoutForm: React.FC = () => {
 
     try {
       const savedWorkout = await saveWorkout(workout);
-      
+
       // Optimistically update the UI
       setWorkout(savedWorkout);
 
       // Navigate back to the workouts list
-      navigate('/workouts');
+      navigate("/workouts");
     } catch (error) {
-      console.error('Error saving workout:', error);
-      setError('Failed to save workout. Please try again.');
+      console.error("Error saving workout:", error);
+      setError("Failed to save workout. Please try again.");
     }
   };
 
@@ -216,7 +160,7 @@ const WorkoutForm: React.FC = () => {
         <FaArrowLeft /> Back
       </BackButton>
       <h3>Exercise Group {editingGroupIndex !== null ? editingGroupIndex + 1 : workout.exerciseGroups.length + 1}</h3>
-      
+
       <Label htmlFor="groupSets">Number of Sets</Label>
       <Select
         id="groupSets"
@@ -234,7 +178,7 @@ const WorkoutForm: React.FC = () => {
           <Select
             id={`exercise-${index}`}
             value={exercise.exerciseId}
-            onChange={(e) => handleExerciseChange(index, 'exerciseId', e.target.value)}
+            onChange={(e) => handleExerciseChange(index, "exerciseId", e.target.value)}
             required
           >
             <option value="">Select an exercise</option>
@@ -248,7 +192,7 @@ const WorkoutForm: React.FC = () => {
             id={`weight-${index}`}
             type="number"
             value={exercise.weight}
-            onChange={(e) => handleExerciseChange(index, 'weight', parseFloat(e.target.value))}
+            onChange={(e) => handleExerciseChange(index, "weight", parseFloat(e.target.value))}
             min="0"
             step="0.1"
             required
@@ -259,7 +203,7 @@ const WorkoutForm: React.FC = () => {
             id={`reps-${index}`}
             type="number"
             value={exercise.reps}
-            onChange={(e) => handleExerciseChange(index, 'reps', parseInt(e.target.value))}
+            onChange={(e) => handleExerciseChange(index, "reps", parseInt(e.target.value))}
             min="0"
             required
           />
@@ -271,7 +215,7 @@ const WorkoutForm: React.FC = () => {
       </Button>
 
       <Button type="button" onClick={handleAddGroup}>
-        {editingGroupIndex !== null ? 'Update Group' : 'Add Group to Workout'}
+        {editingGroupIndex !== null ? "Update Group" : "Add Group to Workout"}
       </Button>
     </>
   );
@@ -306,7 +250,7 @@ const WorkoutForm: React.FC = () => {
 
   return (
     <FormContainer onSubmit={handleSubmit}>
-      <h2>{id ? 'Edit Workout' : 'Create Workout'}</h2>
+      <h2>{id ? "Edit Workout" : "Create Workout"}</h2>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {formStage === FormStage.TITLE && renderTitleStage()}
       {formStage === FormStage.GROUP && renderGroupStage()}

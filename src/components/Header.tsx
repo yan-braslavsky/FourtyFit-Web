@@ -1,8 +1,7 @@
-// src/components/Header.tsx
 import React from "react";
 import styled from "styled-components";
 import { Link, useLocation } from "react-router-dom";
-import { FaListUl, FaDumbbell, FaRunning } from "react-icons/fa";
+import { FaListUl, FaDumbbell } from "react-icons/fa";
 import { GiGymBag, GiMuscleUp } from "react-icons/gi";
 
 const HeaderContainer = styled.header`
@@ -71,18 +70,13 @@ const Header: React.FC = () => {
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/create-workout" $isActive={location.pathname === "/create-workout"}>
-              <FaDumbbell /> Create Workout
-            </NavLink>
-          </NavItem>
-          <NavItem>
             <NavLink to="/equipment" $isActive={location.pathname === "/equipment"}>
               <GiGymBag /> Equipment
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink to="/exercises" $isActive={location.pathname === "/exercises"}>
-              <FaRunning /> Exercises
+              <FaDumbbell /> Exercises
             </NavLink>
           </NavItem>
           <NavItem>

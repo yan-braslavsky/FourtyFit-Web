@@ -7,8 +7,7 @@ import EquipmentForm from "./components/EquipmentForm";
 import EquipmentList from "./components/EquipmentList";
 import ExerciseForm from "./components/ExerciseForm";
 import ExerciseList from "./components/ExerciseList";
-import WorkoutForm from "./components/WorkoutForm";
-import WorkoutList from "./components/WorkoutList";
+import Workouts from "./components/workouts/Workouts";
 import MuscleGroupForm from "./components/MuscleGroupForm";
 import MuscleGroupList from "./components/MuscleGroupList";
 import { theme } from "./styles/theme";
@@ -37,9 +36,7 @@ const App: React.FC = () => {
           <ContentContainer>
             <Routes>
               <Route path="/" element={<Navigate replace to="/workouts" />} />
-              <Route path="/workouts" element={<WorkoutList />} />
-              <Route path="/create-workout" element={<WorkoutForm />} />
-              <Route path="/edit-workout/:id" element={<WorkoutForm />} />
+              <Route path="/workouts/*" element={<Workouts />} />
               <Route path="/equipment" element={<EquipmentList />} />
               <Route path="/add-equipment" element={<EquipmentForm />} />
               <Route path="/edit-equipment/:id" element={<EquipmentForm />} />
