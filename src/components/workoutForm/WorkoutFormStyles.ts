@@ -218,3 +218,20 @@ export const IconButton = styled.button`
   color: ${props => props.theme.colors.primary};
   padding: 0.5rem;
 `;
+
+export const CreateButton = styled.button<{ disabled: boolean }>`
+  background-color: ${props => props.disabled ? props.theme.colors.disabled : props.theme.colors.accent};
+  color: ${props => props.theme.colors.text};
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  opacity: ${props => props.disabled ? 0.6 : 1};
+  font-weight: bold;
+
+  &:hover {
+    background-color: ${props => props.disabled ? props.theme.colors.disabled : props.theme.colors.accentHover};
+  }
+`;

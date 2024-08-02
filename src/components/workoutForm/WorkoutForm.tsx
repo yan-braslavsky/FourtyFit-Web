@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useWorkoutFormViewModel } from "./WorkoutFormViewModel";
 import ImageCropper from "../../components/ImageCropper";
 import { FaArrowLeft, FaPlus, FaMinus, FaTimes, FaEdit, FaSearch } from "react-icons/fa";
 import styled from "styled-components";
 import * as S from "./WorkoutFormStyles";
+
 
 const CropperWrapper = styled.div`
   position: absolute;
@@ -18,6 +19,7 @@ const WorkoutForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const [isEditingImage, setIsEditingImage] = useState(false);
+  const [isImageUploaded, setIsImageUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<any>(null);
 
@@ -34,13 +36,26 @@ const WorkoutForm: React.FC = () => {
     removeExerciseGroup,
     updateExerciseGroup,
     filterExercises,
+    updateWorkoutImage,
   } = useWorkoutFormViewModel(id, cropperRef);
+
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    const isValid = workout.name.trim() !== '' &&
+      (isImageUploaded || !!workout.imageUrl) &&
+      workout.exerciseGroups.length > 0 &&
+      workout.exerciseGroups.every(group => group.exercises.length > 0);
+    setIsFormValid(isValid);
+  }, [workout, isImageUploaded]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await handleSubmit(e);
-    if (success) {
-      navigate("/workouts");
+    if (isFormValid) {
+      const success = await handleSubmit(e);
+      if (success) {
+        navigate("/workouts");
+      }
     }
   };
 
@@ -57,6 +72,7 @@ const WorkoutForm: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
       setIsEditingImage(true);
+      setIsImageUploaded(true);
     }
   };
 
@@ -66,7 +82,9 @@ const WorkoutForm: React.FC = () => {
         <S.DiscardButton type="button" onClick={handleDiscard}>
           <FaArrowLeft /> Discard
         </S.DiscardButton>
-        <S.SaveButton type="submit">Save Workout</S.SaveButton>
+        <S.CreateButton type="submit" disabled={!isFormValid}>
+          {id ? "Save" : "Create"} Workout
+        </S.CreateButton>
       </S.TopBar>
 
       <h2>{id ? "Edit Workout" : "Create Workout"}</h2>
@@ -90,7 +108,11 @@ const WorkoutForm: React.FC = () => {
             <CropperWrapper>
               <ImageCropper
                 imageFile={imageFile}
-                onCrop={() => {}}
+                onCrop={(croppedImage) => {
+                  updateWorkoutImage(URL.createObjectURL(croppedImage));
+                  setIsEditingImage(false);
+                  setIsImageUploaded(true);
+                }}
                 ref={cropperRef}
                 aspectRatio={16 / 9}
               />
@@ -141,7 +163,7 @@ const WorkoutForm: React.FC = () => {
               />
             </S.SearchBar>
             <S.SelectedExercises>
-              {group.exercises.map((exercise, exerciseIndex) => (
+              {group.exercises.map((exercise) => (
                 <S.ExerciseItem
                   key={exercise.exerciseId}
                   onClick={() => toggleExercise(groupIndex, exercise.exerciseId)}

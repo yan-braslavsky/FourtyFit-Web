@@ -43,10 +43,10 @@ const NavLink = styled(Link)<{ $isActive: boolean }>`
   border-radius: 4px;
   transition: background-color 0.3s ease;
 
-  background-color: ${props => props.$isActive ? props.theme.colors.accent : "transparent"};
+  background-color: ${props => props.$isActive ? props.theme.colors.navActive : "transparent"};
 
   &:hover {
-    background-color: ${props => props.theme.colors.accent};
+    background-color: ${props => props.theme.colors.navActive};
   }
 
   svg {

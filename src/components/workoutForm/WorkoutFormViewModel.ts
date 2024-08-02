@@ -3,6 +3,7 @@ import { Workout, getWorkout, saveWorkout, checkWorkoutExists } from "../../serv
 import { Exercise, getExercises } from "../../services/exerciseService";
 import { uploadImage } from "../../services/storageService";
 
+
 export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObject<any>) => {
   const [workout, setWorkout] = useState<Workout>({
     name: "",
@@ -55,7 +56,7 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
   const addExerciseGroup = () => {
     setWorkout(prev => ({
       ...prev,
-      exerciseGroups: [...prev.exerciseGroups, { exercises: [], sets: 1 }]
+      exerciseGroups: [...prev.exerciseGroups, { exercises: [], sets: 2 }]
     }));
   };
 
@@ -82,9 +83,19 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
     setFilteredExercises(filtered);
   };
 
+  const updateWorkoutImage = (imageUrl: string) => {
+    setWorkout(prev => ({ ...prev, imageUrl }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!workout.name.trim() || workout.exerciseGroups.length === 0 ||
+      !workout.exerciseGroups.every(group => group.exercises.length > 0)) {
+      setError("Please fill in all required fields and add at least one exercise to each group.");
+      return false;
+    }
 
     try {
       let imageUrl = workout.imageUrl;
@@ -92,6 +103,11 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
       if (imageFile && cropperRef?.current) {
         const croppedImageBlob = await cropperRef.current.cropImage();
         imageUrl = await uploadImage(croppedImageBlob, `workouts/${Date.now()}.png`);
+      }
+
+      if (!imageUrl) {
+        setError("Please upload an image for the workout.");
+        return false;
       }
 
       const workoutData: Workout = {
@@ -127,5 +143,6 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
     removeExerciseGroup,
     updateExerciseGroup,
     filterExercises,
+    updateWorkoutImage,
   };
 };
