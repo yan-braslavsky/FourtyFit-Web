@@ -52,15 +52,6 @@ export const Input = styled.input`
 `;
 
 
-export const ImagePreview = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
 export const EditImageButton = styled(Button)`
   position: absolute;
   bottom: 10px;
@@ -69,12 +60,6 @@ export const EditImageButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-export const ExerciseGroup = styled.div`
-  background-color: ${props => props.theme.colors.card};
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-`;
 
 export const ExerciseGroupHeader = styled.div`
   display: flex;
@@ -152,12 +137,6 @@ export const SelectedExercises = styled.div`
   padding: 0.5rem;
 `;
 
-export const ExerciseList = styled.div`
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid ${props => props.theme.colors.primary};
-  border-radius: 4px;
-`;
 
 export const ExerciseItem = styled.div`
   display: flex;
@@ -220,12 +199,13 @@ export const CreateButton = styled.button<{ disabled: boolean }>`
   }
 `;
 
+
+
 export const FormContainer = styled.form`
   background-color: ${props => props.theme.colors.background};
   padding: 2rem;
   border-radius: 12px;
-  width: 100%;
-  max-width: 1200px; // Increased max-width
+  width: 800px; // Fixed width
   margin: 2rem auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
@@ -233,10 +213,31 @@ export const FormContainer = styled.form`
 export const ImageContainer = styled.div`
   position: relative;
   width: 100%;
-  padding-top: 56.25%; // 16:9 aspect ratio
+  height: 400px; // Fixed height
   margin-bottom: 1rem;
   border: 2px dashed ${props => props.theme.colors.primary};
   border-radius: 8px;
   overflow: hidden;
-  height: 500px; // Increased height for larger cropping experience
+`;
+
+export const ImagePreview = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const ExerciseGroup = styled.div`
+  background-color: ${props => props.theme.colors.card};
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  width: 100%; // Ensure it takes full width of the form
+`;
+
+export const ExerciseList = styled.div`
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid ${props => props.theme.colors.primary};
+  border-radius: 4px;
+  margin-top: 1rem;
 `;

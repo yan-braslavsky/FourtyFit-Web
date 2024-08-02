@@ -6,16 +6,6 @@ import { FaArrowLeft, FaPlus, FaMinus, FaTrashAlt, FaEdit, FaSearch } from "reac
 import styled from "styled-components";
 import * as S from "./WorkoutFormStyles";
 
-
-
-const CropperWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-`;
-
 const WorkoutForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -122,18 +112,16 @@ const WorkoutForm: React.FC = () => {
         <S.Label>Workout Image</S.Label>
         <S.ImageContainer>
           {isEditingImage && imageFile ? (
-            <CropperWrapper>
-              <ImageCropper
-                imageFile={imageFile}
-                onCrop={(croppedImage) => {
-                  updateWorkoutImage(URL.createObjectURL(croppedImage));
-                  setIsEditingImage(false);
-                  setIsImageUploaded(true);
-                }}
-                ref={cropperRef}
-                aspectRatio={16 / 9}
-              />
-            </CropperWrapper>
+            <ImageCropper
+              imageFile={imageFile}
+              onCrop={(croppedImage) => {
+                updateWorkoutImage(URL.createObjectURL(croppedImage));
+                setIsEditingImage(false);
+                setIsImageUploaded(true);
+              }}
+              ref={cropperRef}
+              aspectRatio={16 / 9}
+            />
           ) : (
             <>
               <S.ImagePreview src={workout.imageUrl || "/placeholder-image.jpg"} alt={workout.name} />
