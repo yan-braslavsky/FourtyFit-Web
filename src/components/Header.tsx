@@ -1,8 +1,7 @@
-// src/components/Header.tsx
 import React from "react";
 import styled from "styled-components";
 import { Link, useLocation } from "react-router-dom";
-import { FaListUl, FaDumbbell, FaRunning } from "react-icons/fa";
+import { FaListUl, FaDumbbell } from "react-icons/fa";
 import { GiGymBag, GiMuscleUp } from "react-icons/gi";
 
 const HeaderContainer = styled.header`
@@ -44,10 +43,10 @@ const NavLink = styled(Link)<{ $isActive: boolean }>`
   border-radius: 4px;
   transition: background-color 0.3s ease;
 
-  background-color: ${props => props.$isActive ? props.theme.colors.accent : "transparent"};
+  background-color: ${props => props.$isActive ? props.theme.colors.navActive : "transparent"};
 
   &:hover {
-    background-color: ${props => props.theme.colors.accent};
+    background-color: ${props => props.theme.colors.navActive};
   }
 
   svg {
@@ -71,18 +70,13 @@ const Header: React.FC = () => {
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to="/create-workout" $isActive={location.pathname === "/create-workout"}>
-              <FaDumbbell /> Create Workout
-            </NavLink>
-          </NavItem>
-          <NavItem>
             <NavLink to="/equipment" $isActive={location.pathname === "/equipment"}>
               <GiGymBag /> Equipment
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink to="/exercises" $isActive={location.pathname === "/exercises"}>
-              <FaRunning /> Exercises
+              <FaDumbbell /> Exercises
             </NavLink>
           </NavItem>
           <NavItem>

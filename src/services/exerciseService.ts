@@ -11,7 +11,7 @@ export interface Exercise {
 }
 
 export const getExercises = async (): Promise<Exercise[]> => {
-  const exercisesCol = collection(db, 'exercises');
+  const exercisesCol = collection(db, "exercises");
   const exerciseSnapshot = await getDocs(exercisesCol);
   return exerciseSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Exercise));
 };
@@ -49,8 +49,8 @@ export const deleteExercise = async (id: string): Promise<void> => {
 };
 
 export const checkExerciseExists = async (name: string): Promise<boolean> => {
-  const exercisesCol = collection(db, 'exercises');
-  const q = query(exercisesCol, where('name', '==', name), limit(1));
+  const exercisesCol = collection(db, "exercises");
+  const q = query(exercisesCol, where("name", "==", name), limit(1));
   const querySnapshot = await getDocs(q);
   return !querySnapshot.empty;
 };
