@@ -2,6 +2,8 @@ import { useState, useEffect, MutableRefObject } from "react";
 import { Workout, getWorkout, saveWorkout, checkWorkoutExists } from "../../services/workoutService";
 import { Exercise, getExercises } from "../../services/exerciseService";
 import { uploadImage } from "../../services/storageService";
+import { MuscleGroup, getMuscleGroups } from "../../services/muscleGroupService";
+import { Equipment, getEquipment } from "../../services/equipmentService";
 
 
 export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObject<any>) => {
@@ -14,13 +16,21 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
   const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const fetchedExercises = await getExercises();
+        const [fetchedExercises, fetchedMuscleGroups, fetchedEquipment] = await Promise.all([
+          getExercises(),
+          getMuscleGroups(),
+          getEquipment()
+        ]);
         setExercises(fetchedExercises);
         setFilteredExercises(fetchedExercises);
+        setMuscleGroups(fetchedMuscleGroups);
+        setEquipment(fetchedEquipment);
 
         if (id) {
           const fetchedWorkout = await getWorkout(id);
@@ -33,6 +43,14 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
     };
     fetchData();
   }, [id]);
+
+  const getMuscleGroupName = (id: string) => {
+    return muscleGroups.find(mg => mg.id === id)?.name || id;
+  };
+
+  const getEquipmentName = (id: string) => {
+    return equipment.find(eq => eq.id === id)?.name || id;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -144,5 +162,7 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
     updateExerciseGroup,
     filterExercises,
     updateWorkoutImage,
+    getMuscleGroupName,
+    getEquipmentName,
   };
 };

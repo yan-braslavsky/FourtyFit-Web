@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useWorkoutFormViewModel } from "./WorkoutFormViewModel";
 import ImageCropper from "../../components/ImageCropper";
-import { FaArrowLeft, FaPlus, FaMinus, FaTimes, FaEdit, FaSearch } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaMinus, FaTrashAlt, FaEdit, FaSearch } from "react-icons/fa";
 import styled from "styled-components";
 import * as S from "./WorkoutFormStyles";
+
 
 
 const CropperWrapper = styled.div`
@@ -22,6 +23,7 @@ const WorkoutForm: React.FC = () => {
   const [isImageUploaded, setIsImageUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<any>(null);
+  const [groupSearchTerms, setGroupSearchTerms] = useState<string[]>([]);
 
   const {
     workout,
@@ -35,17 +37,18 @@ const WorkoutForm: React.FC = () => {
     addExerciseGroup,
     removeExerciseGroup,
     updateExerciseGroup,
-    filterExercises,
     updateWorkoutImage,
+    getMuscleGroupName,
+    getEquipmentName,
   } = useWorkoutFormViewModel(id, cropperRef);
 
   const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     const isValid = workout.name.trim() !== '' &&
-      (isImageUploaded || !!workout.imageUrl) &&
-      workout.exerciseGroups.length > 0 &&
-      workout.exerciseGroups.every(group => group.exercises.length > 0);
+                    (isImageUploaded || !!workout.imageUrl) &&
+                    workout.exerciseGroups.length > 0 &&
+                    workout.exerciseGroups.every(group => group.exercises.length > 0);
     setIsFormValid(isValid);
   }, [workout, isImageUploaded]);
 
@@ -74,6 +77,20 @@ const WorkoutForm: React.FC = () => {
       setIsEditingImage(true);
       setIsImageUploaded(true);
     }
+  };
+
+  const handleGroupSearch = (groupIndex: number, searchTerm: string) => {
+    const newGroupSearchTerms = [...groupSearchTerms];
+    newGroupSearchTerms[groupIndex] = searchTerm;
+    setGroupSearchTerms(newGroupSearchTerms);
+  };
+
+  const getFilteredExercisesForGroup = (groupIndex: number) => {
+    const searchTerm = groupSearchTerms[groupIndex] || "";
+    return exercises.filter(exercise => 
+      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      exercise.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   };
 
   return (
@@ -142,7 +159,7 @@ const WorkoutForm: React.FC = () => {
             <S.ExerciseGroupHeader>
               <S.Label>Group {groupIndex + 1}</S.Label>
               <S.RemoveButton onClick={() => removeExerciseGroup(groupIndex)}>
-                <FaTimes />
+                <FaTrashAlt />
               </S.RemoveButton>
             </S.ExerciseGroupHeader>
             <S.Label>Number of Sets</S.Label>
@@ -159,7 +176,7 @@ const WorkoutForm: React.FC = () => {
               <S.SearchInput
                 type="text"
                 placeholder="Search exercises..."
-                onChange={(e) => filterExercises(e.target.value)}
+                onChange={(e) => handleGroupSearch(groupIndex, e.target.value)}
               />
             </S.SearchBar>
             <S.SelectedExercises>
@@ -178,7 +195,7 @@ const WorkoutForm: React.FC = () => {
               ))}
             </S.SelectedExercises>
             <S.ExerciseList>
-              {exercises.filter(e => !group.exercises.some(ge => ge.exerciseId === e.id)).map((exercise) => (
+              {getFilteredExercisesForGroup(groupIndex).filter(e => !group.exercises.some(ge => ge.exerciseId === e.id)).map((exercise) => (
                 <S.ExerciseItem
                   key={exercise.id}
                   onClick={() => toggleExercise(groupIndex, exercise.id!)}
@@ -189,10 +206,10 @@ const WorkoutForm: React.FC = () => {
                     <S.ExerciseDescription>{exercise.description}</S.ExerciseDescription>
                     <S.BadgeContainer>
                       {exercise.equipmentIds.map((equipId) => (
-                        <S.Badge key={equipId} color="primary">{equipId}</S.Badge>
+                        <S.Badge key={equipId} color="primary">{getEquipmentName(equipId)}</S.Badge>
                       ))}
                       {exercise.muscleGroupIds.map((muscleId) => (
-                        <S.Badge key={muscleId} color="secondary">{muscleId}</S.Badge>
+                        <S.Badge key={muscleId} color="secondary">{getMuscleGroupName(muscleId)}</S.Badge>
                       ))}
                     </S.BadgeContainer>
                   </S.ExerciseInfo>

@@ -1,13 +1,6 @@
 import styled from "styled-components";
 
-export const FormContainer = styled.form`
-  background-color: ${props => props.theme.colors.background};
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 800px;
-  margin: 2rem auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
+
 
 export const TopBar = styled.div`
   display: flex;
@@ -58,15 +51,6 @@ export const Input = styled.input`
   font-size: 1rem;
 `;
 
-export const ImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; // 16:9 aspect ratio
-  margin-bottom: 1rem;
-  border: 2px dashed ${props => props.theme.colors.primary};
-  border-radius: 8px;
-  overflow: hidden;
-`;
 
 export const ImagePreview = styled.img`
   position: absolute;
@@ -234,4 +218,25 @@ export const CreateButton = styled.button<{ disabled: boolean }>`
   &:hover {
     background-color: ${props => props.disabled ? props.theme.colors.disabled : props.theme.colors.accentHover};
   }
+`;
+
+export const FormContainer = styled.form`
+  background-color: ${props => props.theme.colors.background};
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1200px; // Increased max-width
+  margin: 2rem auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+export const ImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; // 16:9 aspect ratio
+  margin-bottom: 1rem;
+  border: 2px dashed ${props => props.theme.colors.primary};
+  border-radius: 8px;
+  overflow: hidden;
+  height: 500px; // Increased height for larger cropping experience
 `;
