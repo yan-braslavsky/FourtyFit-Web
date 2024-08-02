@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWorkouts, deleteWorkout, Workout, DetailedWorkout } from "../../services/workoutService";
+import { getWorkouts, deleteWorkout, Workout } from "../../services/workoutService";
 import { getMuscleGroups, MuscleGroup } from "../../services/muscleGroupService";
 import { getEquipment, Equipment } from "../../services/equipmentService";
 import { getExercises, Exercise } from "../../services/exerciseService";

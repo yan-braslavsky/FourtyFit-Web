@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useWorkoutFormViewModel } from "./WorkoutFormViewModel";
 import ImageCropper from "../../components/ImageCropper";
 import { FaArrowLeft, FaPlus, FaMinus, FaTrashAlt, FaEdit, FaSearch } from "react-icons/fa";
-import styled from "styled-components";
 import * as S from "./WorkoutFormStyles";
 
 const WorkoutForm: React.FC = () => {
