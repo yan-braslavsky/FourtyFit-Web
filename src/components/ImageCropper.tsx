@@ -1,4 +1,3 @@
-// src/components/ImageCropper.tsx
 import { useState, useCallback, forwardRef, useImperativeHandle, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
@@ -14,13 +13,14 @@ const CropperContainer = styled.div`
 interface ImageCropperProps {
   imageFile: File | string;
   onCrop: (croppedImage: Blob) => void;
+  aspectRatio?: number;
 }
 
 export interface ImageCropperRef {
   cropImage: () => Promise<Blob>;
 }
 
-const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(({ imageFile, onCrop }, ref) => {
+const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(({ imageFile, onCrop, aspectRatio = 1 }, ref) => {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -65,7 +65,7 @@ const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(({ imageFile
         image={imageUrl}
         crop={crop}
         zoom={zoom}
-        aspect={1}
+        aspect={aspectRatio}
         onCropChange={setCrop}
         onCropComplete={onCropComplete}
         onZoomChange={setZoom}

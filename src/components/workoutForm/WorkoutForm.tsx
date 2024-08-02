@@ -1,198 +1,194 @@
-import React from "react";
-import { SingleValue, MultiValue } from "react-select";
+import React, { useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useWorkoutFormViewModel } from "./WorkoutFormViewModel";
-import { FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
-import {
-  FormContainer,
-  Input,
-  Label,
-  Button,
-  BackButton,
-  ExerciseGroupContainer,
-  GroupList,
-  GroupListItem,
-  ErrorMessage,
-  StyledSelect
-} from "./WorkoutFormStyles";
+import ImageCropper from "../../components/ImageCropper";
+import { FaArrowLeft, FaPlus, FaMinus, FaTimes, FaEdit, FaSearch } from "react-icons/fa";
+import styled from "styled-components";
+import * as S from "./WorkoutFormStyles";
 
-interface OptionType {
-  value: string;
-  label: string;
-}
+const CropperWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;
 
 const WorkoutForm: React.FC = () => {
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
+  const [isEditingImage, setIsEditingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropperRef = useRef<any>(null);
+
   const {
     workout,
     exercises,
-    muscleGroups,
-    equipmentList,
-    currentGroup,
-    formStage,
-    titleError,
-    editingGroupIndex,
     error,
-    handleTitleChange,
-    handleAddExercise,
-    handleExerciseChange,
-    handleMuscleGroupChange,
-    handleEquipmentChange,
-    handleAddGroup,
-    handleEditGroup,
-    handleDeleteGroup,
+    imageFile,
+    setImageFile,
+    handleInputChange,
+    toggleExercise,
     handleSubmit,
-    setFormStage,
-    setCurrentGroup,
-    setWorkout,
-    FormStage
-  } = useWorkoutFormViewModel();
+    addExerciseGroup,
+    removeExerciseGroup,
+    updateExerciseGroup,
+    filterExercises,
+  } = useWorkoutFormViewModel(id, cropperRef);
 
-  const renderTitleStage = () => (
-    <>
-      <Label htmlFor="workoutTitle">Title</Label>
-      <Input
-        id="workoutTitle"
-        type="text"
-        placeholder="Workout Title"
-        value={workout.name}
-        onChange={(e) => handleTitleChange(e.target.value)}
-        required
-      />
-      {titleError && <ErrorMessage>{titleError}</ErrorMessage>}
-      <Button type="button" onClick={() => setFormStage(FormStage.DETAILS)} disabled={!workout.name || !!titleError}>
-        Next
-      </Button>
-    </>
-  );
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await handleSubmit(e);
+    if (success) {
+      navigate("/workouts");
+    }
+  };
 
-  const renderDetailsStage = () => (
-    <>
-      <Label htmlFor="workoutImage">Image URL</Label>
-      <Input
-        id="workoutImage"
-        type="text"
-        placeholder="Image URL"
-        value={workout.imageUrl}
-        onChange={(e) => setWorkout(prev => ({ ...prev, imageUrl: e.target.value }))}
-      />
-      <Label htmlFor="muscleGroups">Muscle Groups</Label>
-      <StyledSelect
-        id="muscleGroups"
-        options={muscleGroups.map(group => ({ value: group.id, label: group.name }))}
-        value={workout.muscleGroups.map((id: string) => ({ value: id, label: muscleGroups.find(g => g.id === id)?.name || id }))}
-        onChange={(selected: MultiValue<OptionType>) => handleMuscleGroupChange(selected.map(option => option.value))}
-        isMulti
-      />
-      <Label htmlFor="equipment">Equipment</Label>
-      <StyledSelect
-        id="equipment"
-        options={equipmentList.map(item => ({ value: item.id, label: item.name }))}
-        value={workout.equipment.map((id: string) => ({ value: id, label: equipmentList.find(e => e.id === id)?.name || id }))}
-        onChange={(selected: MultiValue<OptionType>) => handleEquipmentChange(selected.map(option => option.value))}
-        isMulti
-      />
-      <Button type="button" onClick={() => setFormStage(FormStage.GROUP)}>
-        Next
-      </Button>
-    </>
-  );
+  const handleDiscard = () => {
+    navigate("/workouts");
+  };
 
-  const renderGroupStage = () => (
-    <>
-      <BackButton type="button" onClick={() => setFormStage(FormStage.REVIEW)}>
-        <FaArrowLeft /> Back
-      </BackButton>
-      <h3>Exercise Group {editingGroupIndex !== null ? editingGroupIndex + 1 : workout.exerciseGroups.length + 1}</h3>
-      
-      <Label htmlFor="groupSets">Number of Sets</Label>
-      <StyledSelect
-        id="groupSets"
-        value={{ value: currentGroup.sets.toString(), label: currentGroup.sets.toString() }}
-        onChange={(selected: SingleValue<OptionType>) => setCurrentGroup({ ...currentGroup, sets: parseInt(selected?.value || "1") })}
-        options={[1, 2, 3, 4, 5].map(num => ({ value: num.toString(), label: num.toString() }))}
-      />
+  const handleImageEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    fileInputRef.current?.click();
+  };
 
-      {currentGroup.exercises.map((exercise, index) => (
-        <ExerciseGroupContainer key={index}>
-          <Label htmlFor={`exercise-${index}`}>Exercise</Label>
-          <StyledSelect
-            id={`exercise-${index}`}
-            value={{ value: exercise.exerciseId, label: exercises.find(e => e.id === exercise.exerciseId)?.name || "" }}
-            onChange={(selected: SingleValue<OptionType>) => handleExerciseChange(index, "exerciseId", selected?.value || "")}
-            options={exercises.map(ex => ({ value: ex.id, label: ex.name }))}
-          />
-
-          <Label htmlFor={`weight-${index}`}>Weight (kg)</Label>
-          <Input
-            id={`weight-${index}`}
-            type="number"
-            value={exercise.weight}
-            onChange={(e) => handleExerciseChange(index, "weight", parseFloat(e.target.value))}
-            min="0"
-            step="0.1"
-            required
-          />
-
-          <Label htmlFor={`reps-${index}`}>Reps</Label>
-          <Input
-            id={`reps-${index}`}
-            type="number"
-            value={exercise.reps}
-            onChange={(e) => handleExerciseChange(index, "reps", parseInt(e.target.value))}
-            min="0"
-            required
-          />
-        </ExerciseGroupContainer>
-      ))}
-
-      <Button type="button" onClick={handleAddExercise}>
-        Add Another Exercise to Group
-      </Button>
-
-      <Button type="button" onClick={handleAddGroup}>
-        {editingGroupIndex !== null ? "Update Group" : "Add Group to Workout"}
-      </Button>
-    </>
-  );
-
-  const renderReviewStage = () => (
-    <>
-      <BackButton type="button" onClick={() => setFormStage(FormStage.TITLE)}>
-        <FaArrowLeft /> Back to Title
-      </BackButton>
-      <h3>Review Workout</h3>
-      <GroupList>
-        {workout.exerciseGroups.map((group, groupIndex) => (
-          <GroupListItem key={groupIndex}>
-            <span>Group {groupIndex + 1} - {group.sets} sets, {group.exercises.length} exercises</span>
-            <div>
-              <Button onClick={() => handleEditGroup(groupIndex)}><FaEdit /></Button>
-              <Button onClick={() => handleDeleteGroup(groupIndex)}><FaTrash /></Button>
-            </div>
-          </GroupListItem>
-        ))}
-      </GroupList>
-      <Button type="button" onClick={() => {
-        setCurrentGroup({ exercises: [], sets: 1 });
-        setFormStage(FormStage.GROUP);
-      }}>
-        Add Another Group
-      </Button>
-      <Button type="submit">Save Workout</Button>
-    </>
-  );
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+      setIsEditingImage(true);
+    }
+  };
 
   return (
-    <FormContainer onSubmit={(e) => {
-      e.preventDefault();
-      handleSubmit();
-    }}>
-      <h2>{workout.id ? "Edit Workout" : "Create Workout"}</h2>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-      {formStage === FormStage.TITLE && renderTitleStage()}
-      {formStage === FormStage.DETAILS && renderDetailsStage()}
-      {formStage === FormStage.GROUP && renderGroupStage()}
-      {formStage === FormStage.REVIEW && renderReviewStage()}
-    </FormContainer>
+    <S.FormContainer onSubmit={onSubmit}>
+      <S.TopBar>
+        <S.DiscardButton type="button" onClick={handleDiscard}>
+          <FaArrowLeft /> Discard
+        </S.DiscardButton>
+        <S.SaveButton type="submit">Save Workout</S.SaveButton>
+      </S.TopBar>
+
+      <h2>{id ? "Edit Workout" : "Create Workout"}</h2>
+
+      <S.FormSection>
+        <S.Label>Workout Title</S.Label>
+        <S.Input
+          type="text"
+          name="name"
+          value={workout.name}
+          onChange={handleInputChange}
+          placeholder="Enter workout title"
+          required
+        />
+      </S.FormSection>
+
+      <S.FormSection>
+        <S.Label>Workout Image</S.Label>
+        <S.ImageContainer>
+          {isEditingImage && imageFile ? (
+            <CropperWrapper>
+              <ImageCropper
+                imageFile={imageFile}
+                onCrop={() => {}}
+                ref={cropperRef}
+                aspectRatio={16 / 9}
+              />
+            </CropperWrapper>
+          ) : (
+            <>
+              <S.ImagePreview src={workout.imageUrl || "/placeholder-image.jpg"} alt={workout.name} />
+              <S.EditImageButton onClick={handleImageEdit} type="button">
+                <FaEdit />
+              </S.EditImageButton>
+            </>
+          )}
+        </S.ImageContainer>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          ref={fileInputRef}
+          style={{ display: "none" }}
+        />
+      </S.FormSection>
+
+      <S.FormSection>
+        <S.Label>Exercise Groups</S.Label>
+        {workout.exerciseGroups.map((group, groupIndex) => (
+          <S.ExerciseGroup key={groupIndex}>
+            <S.ExerciseGroupHeader>
+              <S.Label>Group {groupIndex + 1}</S.Label>
+              <S.RemoveButton onClick={() => removeExerciseGroup(groupIndex)}>
+                <FaTimes />
+              </S.RemoveButton>
+            </S.ExerciseGroupHeader>
+            <S.Label>Number of Sets</S.Label>
+            <S.Select
+              value={group.sets}
+              onChange={(e) => updateExerciseGroup(groupIndex, "sets", parseInt(e.target.value))}
+            >
+              {[2, 3, 4, 5].map(num => (
+                <option key={num} value={num}>{num}</option>
+              ))}
+            </S.Select>
+            <S.SearchBar>
+              <FaSearch />
+              <S.SearchInput
+                type="text"
+                placeholder="Search exercises..."
+                onChange={(e) => filterExercises(e.target.value)}
+              />
+            </S.SearchBar>
+            <S.SelectedExercises>
+              {group.exercises.map((exercise, exerciseIndex) => (
+                <S.ExerciseItem
+                  key={exercise.exerciseId}
+                  onClick={() => toggleExercise(groupIndex, exercise.exerciseId)}
+                >
+                  <S.ExerciseInfo>
+                    <S.ExerciseTitle>{exercises.find(e => e.id === exercise.exerciseId)?.name}</S.ExerciseTitle>
+                  </S.ExerciseInfo>
+                  <S.IconButton>
+                    <FaMinus />
+                  </S.IconButton>
+                </S.ExerciseItem>
+              ))}
+            </S.SelectedExercises>
+            <S.ExerciseList>
+              {exercises.filter(e => !group.exercises.some(ge => ge.exerciseId === e.id)).map((exercise) => (
+                <S.ExerciseItem
+                  key={exercise.id}
+                  onClick={() => toggleExercise(groupIndex, exercise.id!)}
+                >
+                  <S.ExerciseImage src={exercise.imageUrl} alt={exercise.name} />
+                  <S.ExerciseInfo>
+                    <S.ExerciseTitle>{exercise.name}</S.ExerciseTitle>
+                    <S.ExerciseDescription>{exercise.description}</S.ExerciseDescription>
+                    <S.BadgeContainer>
+                      {exercise.equipmentIds.map((equipId) => (
+                        <S.Badge key={equipId} color="primary">{equipId}</S.Badge>
+                      ))}
+                      {exercise.muscleGroupIds.map((muscleId) => (
+                        <S.Badge key={muscleId} color="secondary">{muscleId}</S.Badge>
+                      ))}
+                    </S.BadgeContainer>
+                  </S.ExerciseInfo>
+                  <S.IconButton>
+                    <FaPlus />
+                  </S.IconButton>
+                </S.ExerciseItem>
+              ))}
+            </S.ExerciseList>
+          </S.ExerciseGroup>
+        ))}
+        <S.AddButton onClick={addExerciseGroup}>
+          <FaPlus /> Add Exercise Group
+        </S.AddButton>
+      </S.FormSection>
+
+      {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+    </S.FormContainer>
   );
 };
 

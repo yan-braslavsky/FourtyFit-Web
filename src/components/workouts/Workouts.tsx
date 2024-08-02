@@ -17,10 +17,11 @@ import {
   BadgeSection
 } from "./WorkoutsStyles";
 import WorkoutForm from "../workoutForm/WorkoutForm";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaTrash, FaPlus } from "react-icons/fa";
+import { Workout, ExerciseGroup, WorkoutExercise } from "../../services/workoutService";
 
 const Workouts: React.FC = () => {
-  const { workouts, muscleGroups, equipmentList, loading, error, handleDelete } = useWorkoutsViewModel();
+  const { workouts, muscleGroups, equipmentList, loading, error, handleDelete, getFullExercise } = useWorkoutsViewModel();
   const navigate = useNavigate();
 
   if (loading) {
@@ -30,6 +31,16 @@ const Workouts: React.FC = () => {
   if (error) {
     return <WorkoutListContainer>{error}</WorkoutListContainer>;
   }
+
+  const getUniqueBadges = (workout: Workout, type: 'muscleGroups' | 'equipment'): string[] => {
+    const allIds = workout.exerciseGroups.flatMap((group: ExerciseGroup) => 
+      group.exercises.flatMap((exercise: WorkoutExercise) => {
+        const fullExercise = getFullExercise(exercise.exerciseId);
+        return type === 'muscleGroups' ? fullExercise?.muscleGroupIds || [] : fullExercise?.equipmentIds || [];
+      })
+    );
+    return Array.from(new Set(allIds));
+  };
 
   return (
     <Routes>
@@ -45,14 +56,14 @@ const Workouts: React.FC = () => {
             <p>No workouts saved yet. Create your first workout!</p>
           ) : (
             workouts.map(workout => (
-              <WorkoutItem key={workout.id}>
+              <WorkoutItem key={workout.id} onClick={() => navigate(`edit/${workout.id}`)}>
                 <WorkoutImage src={workout.imageUrl || "/placeholder-workout-image.jpg"} alt={workout.name} />
                 <WorkoutInfo>
                   <WorkoutName>{workout.name}</WorkoutName>
                   <BadgeSection>
                     <h4>Muscle Groups:</h4>
                     <BadgeContainer>
-                      {workout.muscleGroups.map(groupId => {
+                      {getUniqueBadges(workout, 'muscleGroups').map(groupId => {
                         const group = muscleGroups.find(mg => mg.id === groupId);
                         return group && <Badge key={groupId} color="primary">{group.name}</Badge>;
                       })}
@@ -61,7 +72,7 @@ const Workouts: React.FC = () => {
                   <BadgeSection>
                     <h4>Equipment:</h4>
                     <BadgeContainer>
-                      {workout.equipment.map(equipId => {
+                      {getUniqueBadges(workout, 'equipment').map(equipId => {
                         const equip = equipmentList.find(eq => eq.id === equipId);
                         return equip && <Badge key={equipId} color="secondary">{equip.name}</Badge>;
                       })}
@@ -70,8 +81,10 @@ const Workouts: React.FC = () => {
                   <ExerciseGroupInfo>Exercise groups: {workout.exerciseGroups.length}</ExerciseGroupInfo>
                 </WorkoutInfo>
                 <ButtonGroup>
-                  <IconButton onClick={() => navigate(`edit/${workout.id}`)}><FaEdit /></IconButton>
-                  <IconButton onClick={() => workout.id && handleDelete(workout.id)}><FaTrash /></IconButton>
+                  <IconButton onClick={(e) => {
+                    e.stopPropagation();
+                    workout.id && handleDelete(workout.id);
+                  }}><FaTrash /></IconButton>
                 </ButtonGroup>
               </WorkoutItem>
             ))

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { getWorkouts, deleteWorkout, DetailedWorkout } from "../../services/workoutService";
+import { getWorkouts, deleteWorkout, Workout, DetailedWorkout } from "../../services/workoutService";
 import { getMuscleGroups, MuscleGroup } from "../../services/muscleGroupService";
 import { getEquipment, Equipment } from "../../services/equipmentService";
+import { getExercises, Exercise } from "../../services/exerciseService";
 
 export const useWorkoutsViewModel = () => {
-  const [workouts, setWorkouts] = useState<DetailedWorkout[]>([]);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
   const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,14 +19,17 @@ export const useWorkoutsViewModel = () => {
   const fetchWorkouts = async () => {
     try {
       setLoading(true);
-      const [fetchedWorkouts, fetchedMuscleGroups, fetchedEquipment] = await Promise.all([
+      const [fetchedWorkouts, fetchedMuscleGroups, fetchedEquipment, fetchedExercises] = await Promise.all([
         getWorkouts(),
         getMuscleGroups(),
-        getEquipment()
+        getEquipment(),
+        getExercises()
       ]);
+      
       setWorkouts(fetchedWorkouts);
       setMuscleGroups(fetchedMuscleGroups);
       setEquipmentList(fetchedEquipment);
+      setExercises(fetchedExercises);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching workouts:", err);
@@ -45,5 +50,9 @@ export const useWorkoutsViewModel = () => {
     }
   };
 
-  return { workouts, muscleGroups, equipmentList, loading, error, handleDelete };
+  const getFullExercise = (exerciseId: string): Exercise | undefined => {
+    return exercises.find(exercise => exercise.id === exerciseId);
+  };
+
+  return { workouts, muscleGroups, equipmentList, loading, error, handleDelete, getFullExercise };
 };

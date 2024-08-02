@@ -27,6 +27,7 @@ export const WorkoutItem = styled.div`
   align-items: flex-start;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  cursor: pointer;  // Add this line to change the cursor on hover
 
   &:hover {
     transform: translateY(-3px);
