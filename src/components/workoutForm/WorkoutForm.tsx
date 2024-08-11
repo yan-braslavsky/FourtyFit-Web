@@ -34,7 +34,6 @@ const WorkoutForm: React.FC = () => {
   } = useWorkoutFormViewModel(id, cropperRef);
 
   const [isEditingImage, setIsEditingImage] = React.useState(false);
-  const [isImageUploaded, setIsImageUploaded] = React.useState(false);
   const [groupSearchTerms, setGroupSearchTerms] = React.useState<string[]>([]);
 
   useEffect(() => {
@@ -68,7 +67,6 @@ const WorkoutForm: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
       setIsEditingImage(true);
-      setIsImageUploaded(true);
     }
   }, [setImageFile]);
 
@@ -130,7 +128,6 @@ const WorkoutForm: React.FC = () => {
               onCrop={(croppedImage) => {
                 updateWorkoutImage(URL.createObjectURL(croppedImage));
                 setIsEditingImage(false);
-                setIsImageUploaded(true);
               }}
               ref={cropperRef}
               aspectRatio={16 / 9}
