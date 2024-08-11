@@ -1,4 +1,4 @@
-import { useState, useEffect, MutableRefObject, useCallback } from "react";
+import { useState, useEffect, MutableRefObject, useCallback, useMemo } from "react";
 import { Workout, getWorkout, saveWorkout, checkWorkoutExists } from "../../services/workoutService";
 import { Exercise, getExercises } from "../../services/exerciseService";
 import { uploadImage } from "../../services/storageService";
@@ -16,6 +16,7 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [expandedGroups, setExpandedGroups] = useState<boolean[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,13 +33,26 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
         if (id) {
           const fetchedWorkout = await getWorkout(id);
           setWorkout(fetchedWorkout);
+          // Initialize all groups as collapsed
+          setExpandedGroups(new Array(fetchedWorkout.exerciseGroups.length).fill(false));
         }
       } catch (err) {
+        console.error("Error fetching data:", err);
         setError("Failed to load data. Please try again.");
       }
     };
     fetchData();
   }, [id]);
+
+  const isFormValid = useMemo(() => {
+    const hasValidName = workout.name.trim() !== "";
+    const hasValidImage = workout.imageUrl !== "" || imageFile !== null;
+    const hasValidGroups = workout.exerciseGroups.length > 0 &&
+      workout.exerciseGroups.every(group => group.exercises.length > 0);
+
+
+    return hasValidName && hasValidImage && hasValidGroups;
+  }, [workout, imageFile]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -63,11 +77,11 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
   }, []);
 
   const addExerciseGroup = useCallback(() => {
-    console.log("WorkoutFormViewModel: Adding exercise group");
     setWorkout(prev => ({
       ...prev,
       exerciseGroups: [...prev.exerciseGroups, { exercises: [], sets: 2 }]
     }));
+    setExpandedGroups(prev => [...prev, true]); // New group is expanded by default
   }, []);
 
   const removeExerciseGroup = useCallback((index: number) => {
@@ -76,6 +90,7 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
       ...prev,
       exerciseGroups: prev.exerciseGroups.filter((_, i) => i !== index)
     }));
+    setExpandedGroups(prev => prev.filter((_, i) => i !== index));
   }, []);
 
   const updateExerciseGroup = useCallback((index: number, field: string, value: number) => {
@@ -99,6 +114,12 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
         exerciseGroups: result
       };
     });
+    setExpandedGroups(prev => {
+      const result = Array.from(prev);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    });
   }, []);
 
   const updateWorkoutImage = useCallback((imageUrl: string) => {
@@ -113,6 +134,14 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
   const getEquipmentName = useCallback((id: string) => {
     return equipment.find(eq => eq.id === id)?.name || id;
   }, [equipment]);
+
+  const toggleGroupExpansion = useCallback((index: number) => {
+    setExpandedGroups(prev => {
+      const newExpandedGroups = [...prev];
+      newExpandedGroups[index] = !newExpandedGroups[index];
+      return newExpandedGroups;
+    });
+  }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,5 +206,8 @@ export const useWorkoutFormViewModel = (id?: string, cropperRef?: MutableRefObje
     updateWorkoutImage,
     getMuscleGroupName,
     getEquipmentName,
+    expandedGroups,
+    toggleGroupExpansion,
+    isFormValid,
   };
 };

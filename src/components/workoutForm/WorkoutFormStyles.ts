@@ -255,6 +255,20 @@ export const ExpandButton = styled.button`
   }
 `;
 
+export const CollapsedGroupPreview = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+export const CollapsedExerciseImage = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+`;
+
 export const DeleteGroupButton = styled.button`
   background-color: ${props => props.theme.colors.error};
   color: white;

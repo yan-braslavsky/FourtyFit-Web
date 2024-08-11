@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useWorkoutFormViewModel } from "./WorkoutFormViewModel";
 import ImageCropper from "../../components/ImageCropper";
@@ -9,12 +9,8 @@ import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautif
 const WorkoutForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const [isEditingImage, setIsEditingImage] = useState(false);
-  const [isImageUploaded, setIsImageUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<any>(null);
-  const [groupSearchTerms, setGroupSearchTerms] = useState<string[]>([]);
-  const [expandedGroups, setExpandedGroups] = useState<boolean[]>([]);
 
   const {
     workout,
@@ -32,34 +28,30 @@ const WorkoutForm: React.FC = () => {
     getMuscleGroupName,
     getEquipmentName,
     reorderExerciseGroups,
+    expandedGroups,
+    toggleGroupExpansion,
+    isFormValid,
   } = useWorkoutFormViewModel(id, cropperRef);
 
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [isEditingImage, setIsEditingImage] = React.useState(false);
+  const [isImageUploaded, setIsImageUploaded] = React.useState(false);
+  const [groupSearchTerms, setGroupSearchTerms] = React.useState<string[]>([]);
 
   useEffect(() => {
-    console.log("WorkoutForm mounted", { id });
-    return () => {
-      console.log("WorkoutForm unmounted", { id });
-    };
-  }, [id]);
-
-  useEffect(() => {
-    console.log("Workout updated", { workout });
-    const isValid = workout.name.trim() !== "" &&
-                    (isImageUploaded || !!workout.imageUrl) &&
-                    workout.exerciseGroups.length > 0 &&
-                    workout.exerciseGroups.every(group => group.exercises.length > 0);
-    setIsFormValid(isValid);
-    setExpandedGroups(new Array(workout.exerciseGroups.length).fill(false));
-  }, [workout, isImageUploaded]);
+    console.log("WorkoutForm: State updated", { 
+      workoutName: workout.name, 
+      imageUrl: workout.imageUrl, 
+      groupsCount: workout.exerciseGroups.length,
+      expandedGroups,
+      isFormValid 
+    });
+  }, [workout, expandedGroups, isFormValid]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
-      const success = await handleSubmit(e);
-      if (success) {
-        navigate("/workouts");
-      }
+    const success = await handleSubmit(e);
+    if (success) {
+      navigate("/workouts");
     }
   };
 
@@ -96,20 +88,13 @@ const WorkoutForm: React.FC = () => {
     );
   }, [exercises, groupSearchTerms]);
 
-  const toggleGroupExpansion = useCallback((index: number) => {
-    setExpandedGroups(prev => {
-      const newExpandedGroups = [...prev];
-      newExpandedGroups[index] = !newExpandedGroups[index];
-      return newExpandedGroups;
-    });
-  }, []);
-
   const onDragEnd = useCallback((result: DropResult) => {
     if (!result.destination) {
       return;
     }
     reorderExerciseGroups(result.source.index, result.destination.index);
   }, [reorderExerciseGroups]);
+
 
   return (
     <S.FormContainer onSubmit={onSubmit}>
@@ -192,6 +177,20 @@ const WorkoutForm: React.FC = () => {
                             {expandedGroups[groupIndex] ? <FaChevronUp /> : <FaChevronDown />}
                           </S.ExpandButton>
                         </S.ExerciseGroupHeader>
+                        {!expandedGroups[groupIndex] && (
+                          <S.CollapsedGroupPreview>
+                            {group.exercises.map((exercise) => {
+                              const fullExercise = exercises.find(e => e.id === exercise.exerciseId);
+                              return fullExercise ? (
+                                <S.CollapsedExerciseImage 
+                                  key={exercise.exerciseId} 
+                                  src={fullExercise.imageUrl} 
+                                  alt={fullExercise.name} 
+                                />
+                              ) : null;
+                            })}
+                          </S.CollapsedGroupPreview>
+                        )}
                         {expandedGroups[groupIndex] && (
                           <>
                             <S.Label>Number of Sets</S.Label>
