@@ -241,3 +241,48 @@ export const ExerciseList = styled.div`
   border-radius: 4px;
   margin-top: 1rem;
 `;
+
+export const ExpandButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: ${props => props.theme.colors.primary};
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: ${props => props.theme.colors.secondary};
+  }
+`;
+
+export const CollapsedGroupPreview = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+export const CollapsedExerciseImage = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+`;
+
+export const DeleteGroupButton = styled.button`
+  background-color: ${props => props.theme.colors.error};
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: 100%;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.theme.colors.errorHover};
+  }
+`;
